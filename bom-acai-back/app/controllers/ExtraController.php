@@ -32,12 +32,30 @@ class ExtraController
     {
         $body  = Flight::request()->data->getData();
         $name  = trim($body['name']  ?? '');
-        $price = $body['price'] ?? null;
+        $price = $body['price']      ?? null;
 
-        if ($name === '' || $price === null) {
-            ApiResponse::error('name and price are required', 400)->send();
+        if ($name === '') {
+            ApiResponse::error('name is required', 400)->send();
             return;
         }
+
+        if (strlen($name) > 80) {
+            ApiResponse::error('name must not exceed 80 characters', 400)->send();
+            return;
+        }
+
+        if ($price === null || !is_numeric($price) || (float) $price < 0) {
+            ApiResponse::error('price must be a number >= 0', 400)->send();
+            return;
+        }
+
+        if ($this->service->existsByName($name)) {
+            ApiResponse::error('Extra name already exists', 409)->send();
+            return;
+        }
+
+        $body['name']  = $name;
+        $body['price'] = (float) $price;
 
         $id = $this->service->create($body);
 
@@ -57,7 +75,40 @@ class ExtraController
         }
 
         $body = Flight::request()->data->getData();
-        $ok   = $this->service->update($id, $body);
+
+        if (array_key_exists('name', $body)) {
+            $name = trim((string) $body['name']);
+
+            if ($name === '') {
+                ApiResponse::error('name is required', 400)->send();
+                return;
+            }
+
+            if (strlen($name) > 80) {
+                ApiResponse::error('name must not exceed 80 characters', 400)->send();
+                return;
+            }
+
+            if ($this->service->existsByName($name, $id)) {
+                ApiResponse::error('Extra name already exists', 409)->send();
+                return;
+            }
+
+            $body['name'] = $name;
+        }
+
+        if (array_key_exists('price', $body)) {
+            $price = $body['price'];
+
+            if (!is_numeric($price) || (float) $price < 0) {
+                ApiResponse::error('price must be a number >= 0', 400)->send();
+                return;
+            }
+
+            $body['price'] = (float) $price;
+        }
+
+        $ok = $this->service->update($id, $body);
 
         if (!$ok) {
             ApiResponse::error('No changes applied', 400)->send();

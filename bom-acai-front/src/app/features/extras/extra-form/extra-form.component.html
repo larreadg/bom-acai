@@ -1,0 +1,114 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Configuraci&oacute;n de extras</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button pButton type="button" routerLink="/extras" icon="pi pi-arrow-left" label="Volver" severity="secondary" [outlined]="true"></button>
+      <button pButton type="button" icon="pi pi-sign-out" label="Cerrar sesi&oacute;n" severity="secondary" [text]="true" (click)="auth.logout()"></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">{{ isEditMode ? 'Edici&oacute;n' : 'Alta' }}</span>
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+      </div>
+    </section>
+
+    @if (error) {
+      <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+    }
+
+    @if (loading) {
+      <section class="loading-card">
+        <p-progress-spinner strokeWidth="4" animationDuration=".6s" ariaLabel="Cargando" />
+        <p>Cargando extra...</p>
+      </section>
+    } @else if (!pageReady) {
+      <section class="error-card">
+        <div class="error-icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <h2>No se pudo abrir el extra</h2>
+        <p>{{ error || 'El extra solicitado no est&aacute; disponible.' }}</p>
+        <button pButton type="button" routerLink="/extras" icon="pi pi-arrow-left" label="Volver al listado"></button>
+      </section>
+    } @else {
+      <div class="editor-grid">
+        <section class="form-card">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+            <div class="field">
+              <label for="name">Nombre</label>
+              <input
+                id="name"
+                pInputText
+                type="text"
+                formControlName="name"
+                placeholder="Ej. Granola, Chocolate, Leche en polvo"
+                [class.ng-invalid]="isFieldInvalid('name')"
+              />
+              @if (isFieldInvalid('name')) {
+                <small class="field-error">El nombre es obligatorio.</small>
+              }
+            </div>
+
+            <div class="field">
+              <label for="price">Precio</label>
+              <p-inputnumber
+                inputId="price"
+                formControlName="price"
+                placeholder="Ej. 2500"
+                [min]="0"
+                [useGrouping]="true"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [invalid]="isFieldInvalid('price')"
+              />
+              @if (isFieldInvalid('price')) {
+                <small class="field-error">El precio es obligatorio y debe ser mayor o igual a 0.</small>
+              }
+            </div>
+
+            <div class="toggle-row">
+              <p-checkbox inputId="active" formControlName="active" [binary]="true"></p-checkbox>
+              <div>
+                <label for="active">Extra activo</label>
+                <p>Si lo desactiv&aacute;s, deja de estar disponible para nuevos pedidos sin perder historial.</p>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button pButton type="button" routerLink="/extras" label="Cancelar" severity="secondary" [outlined]="true" [disabled]="saving"></button>
+              <button pButton type="submit" [label]="submitLabel" icon="pi pi-save" [loading]="saving" [disabled]="saving"></button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="summary-card">
+          <span class="summary-label">Vista previa</span>
+          <h2>{{ previewName }}</h2>
+
+          <div class="summary-row">
+            <span>Precio</span>
+            <strong class="price-preview">{{ previewPrice | number:'1.0-0' }}</strong>
+          </div>
+
+          <div class="summary-status">
+            <span>Estado</span>
+            <p-tag
+              [value]="previewActive ? 'Activo' : 'Inactivo'"
+              [severity]="previewActive ? 'success' : 'secondary'"
+            ></p-tag>
+          </div>
+        </aside>
+      </div>
+    }
+  </main>
+</div>

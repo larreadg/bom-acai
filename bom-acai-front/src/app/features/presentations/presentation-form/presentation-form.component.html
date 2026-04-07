@@ -1,0 +1,243 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Configuraci&oacute;n de presentaciones</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button
+        pButton
+        type="button"
+        routerLink="/presentaciones"
+        icon="pi pi-arrow-left"
+        label="Volver"
+        severity="secondary"
+        [outlined]="true"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-sign-out"
+        label="Cerrar sesi&oacute;n"
+        severity="secondary"
+        [text]="true"
+        (click)="auth.logout()"
+      ></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">{{ isEditMode ? 'Edici&oacute;n' : 'Alta' }}</span>
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+      </div>
+    </section>
+
+    @if (error) {
+      <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+    }
+
+    @if (loading) {
+      <section class="loading-card">
+        <p-progress-spinner strokeWidth="4" animationDuration=".6s" ariaLabel="Cargando" />
+        <p>Cargando presentaci&oacute;n...</p>
+      </section>
+    } @else if (!pageReady) {
+      <section class="error-card">
+        <div class="error-icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <h2>No se pudo abrir la presentaci&oacute;n</h2>
+        <p>{{ error || 'La presentaci&oacute;n solicitada no est&aacute; disponible.' }}</p>
+        <button pButton type="button" routerLink="/presentaciones" icon="pi pi-arrow-left" label="Volver al listado"></button>
+      </section>
+    } @else if (!hasProducts) {
+      <section class="error-card">
+        <div class="error-icon"><i class="pi pi-box"></i></div>
+        <h2>Primero cre&aacute; un producto</h2>
+        <p>Las presentaciones necesitan un producto asociado antes de poder guardarse.</p>
+        <button pButton type="button" routerLink="/productos/nuevo" icon="pi pi-plus" label="Nuevo producto"></button>
+      </section>
+    } @else {
+      <div class="editor-grid">
+        <section class="form-card">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+            <div class="field">
+              <label for="productId">Producto</label>
+              <p-select
+                inputId="productId"
+                formControlName="productId"
+                [options]="products"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Seleccion&aacute; un producto"
+                [filter]="true"
+                filterBy="name"
+                class="w-full"
+                [invalid]="isFieldInvalid('productId')"
+              ></p-select>
+              @if (isFieldInvalid('productId')) {
+                <small class="field-error">El producto es obligatorio.</small>
+              }
+            </div>
+
+            <div class="field">
+              <label for="name">Nombre de la presentaci&oacute;n</label>
+              <input
+                id="name"
+                pInputText
+                type="text"
+                formControlName="name"
+                placeholder="Ej. Isopor 1/4 kg, Vaso 300 ml, Cucurucho"
+                [class.ng-invalid]="isFieldInvalid('name')"
+              />
+              @if (isFieldInvalid('name')) {
+                <small class="field-error">El nombre es obligatorio.</small>
+              }
+            </div>
+
+            <div class="field">
+              <label for="price">Precio</label>
+              <p-inputnumber
+                inputId="price"
+                formControlName="price"
+                placeholder="Ej. 15000"
+                [min]="0"
+                [useGrouping]="true"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [invalid]="isFieldInvalid('price')"
+              />
+              @if (isFieldInvalid('price')) {
+                <small class="field-error">El precio es obligatorio y debe ser mayor o igual a 0.</small>
+              }
+            </div>
+
+            <!-- Image upload -->
+            <div class="field">
+              <label>Imagen <span class="optional">(opcional)</span></label>
+
+              @if (previewObjectUrl) {
+                <!-- New file selected — show preview + clear button -->
+                <div class="image-preview-zone">
+                  <img [src]="previewObjectUrl" alt="Vista previa" class="image-preview-thumb" />
+                  <div class="image-preview-info">
+                    <span class="image-preview-name">{{ selectedFile?.name }}</span>
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-times"
+                      label="Quitar"
+                      severity="danger"
+                      [text]="true"
+                      size="small"
+                      (click)="clearFile()"
+                    ></button>
+                  </div>
+                </div>
+              } @else if (existingImagePath && !removeImage) {
+                <!-- Edit mode with existing image -->
+                <div class="image-preview-zone">
+                  <img [src]="summaryImageUrl!" alt="Imagen actual" class="image-preview-thumb" />
+                  <div class="image-preview-info">
+                    <span class="image-preview-name">Imagen actual</span>
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      label="Eliminar imagen"
+                      severity="danger"
+                      [text]="true"
+                      size="small"
+                      (click)="onRemoveExistingImage()"
+                    ></button>
+                  </div>
+                </div>
+              } @else if (removeImage) {
+                <p class="image-removed-note"><i class="pi pi-info-circle"></i> La imagen ser&aacute; eliminada al guardar.</p>
+              }
+
+              <!-- Upload drop zone -->
+              @if (!previewObjectUrl) {
+                <label class="upload-zone" for="imageFile">
+                  <i class="pi pi-upload upload-icon"></i>
+                  <span class="upload-label">{{ existingImagePath && !removeImage ? 'Reemplazar imagen' : 'Subir imagen' }}</span>
+                  <span class="upload-hint">JPG, PNG, WebP &mdash; m&aacute;x. 8 MB</span>
+                  <input
+                    id="imageFile"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    class="upload-input"
+                    (change)="onFileSelected($event)"
+                  />
+                </label>
+              }
+            </div>
+
+            <div class="toggle-row">
+              <p-checkbox inputId="active" formControlName="active" [binary]="true"></p-checkbox>
+              <div>
+                <label for="active">Presentaci&oacute;n activa</label>
+                <p>Si la desactiv&aacute;s, deja de aparecer en el men&uacute; sin perder historial.</p>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button
+                pButton
+                type="button"
+                routerLink="/presentaciones"
+                label="Cancelar"
+                severity="secondary"
+                [outlined]="true"
+                [disabled]="saving"
+              ></button>
+              <button
+                pButton
+                type="submit"
+                [label]="submitLabel"
+                icon="pi pi-save"
+                [loading]="saving"
+                [disabled]="saving"
+              ></button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="summary-card">
+          <span class="summary-label">Vista previa</span>
+          <h2>{{ previewName }}</h2>
+
+          <div class="summary-row">
+            <span>Producto</span>
+            <strong>{{ previewProductName }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Precio</span>
+            <strong class="price-preview">{{ previewPrice | number:'1.0-0' }}</strong>
+          </div>
+
+          @if (summaryImageUrl) {
+            <div class="summary-image">
+              <img [src]="summaryImageUrl" alt="Vista previa" />
+            </div>
+          }
+
+          <div class="summary-status">
+            <span>Estado</span>
+            <p-tag
+              [value]="previewActive ? 'Activa' : 'Inactiva'"
+              [severity]="previewActive ? 'success' : 'secondary'"
+            ></p-tag>
+          </div>
+        </aside>
+      </div>
+    }
+  </main>
+</div>

@@ -17,6 +17,7 @@ require_once __DIR__ . '/app/services/AuthService.php';
 require_once __DIR__ . '/app/services/CategoryService.php';
 require_once __DIR__ . '/app/services/ProductService.php';
 require_once __DIR__ . '/app/services/ProductPresentationService.php';
+require_once __DIR__ . '/app/services/ImageService.php';
 require_once __DIR__ . '/app/services/ExtraService.php';
 
 // Controllers

@@ -48,6 +48,29 @@ class ProductService
         return $product;
     }
 
+    public function existsByName(string $name, ?int $excludeId = null): bool
+    {
+        $sql    = 'SELECT 1 FROM "products" WHERE LOWER("name") = LOWER(?)';
+        $values = [$name];
+
+        if ($excludeId !== null) {
+            $sql    .= ' AND "id" <> ?';
+            $values[] = $excludeId;
+        }
+
+        $stmt = $this->db->prepare($sql . ' LIMIT 1');
+        $stmt->execute($values);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function categoryExists(int $categoryId): bool
+    {
+        $stmt = $this->db->prepare('SELECT 1 FROM "categories" WHERE "id" = ? LIMIT 1');
+        $stmt->execute([$categoryId]);
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function create(array $data): int|false
     {
         $stmt = $this->db->prepare(

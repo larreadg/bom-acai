@@ -1,0 +1,129 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Administraci&oacute;n de extras</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button pButton type="button" routerLink="/" icon="pi pi-home" label="Inicio" severity="secondary" [outlined]="true"></button>
+      <button pButton type="button" icon="pi pi-sign-out" label="Cerrar sesi&oacute;n" severity="secondary" [text]="true" (click)="auth.logout()"></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">Cat&aacute;logo</span>
+        <h1>Extras</h1>
+        <p>
+          Gestion&aacute; los toppings y agregados disponibles &mdash; granola, chocolate, fruta, leche en polvo &mdash;
+          con su precio para sumarlos a cualquier pedido.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <button pButton type="button" routerLink="/extras/nuevo" icon="pi pi-plus" label="Nuevo extra"></button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Total</span>
+        <strong>{{ totalCount }}</strong>
+        <small>extras registrados</small>
+      </article>
+      <article class="stat-card stat-card--accent">
+        <span class="stat-label">Activos</span>
+        <strong>{{ activeCount }}</strong>
+        <small>disponibles para agregar</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Inactivos</span>
+        <strong>{{ inactiveCount }}</strong>
+        <small>pausados sin perder historial</small>
+      </article>
+    </section>
+
+    <section class="table-card">
+      <div class="toolbar">
+        <div class="search-group">
+          <label for="extra-search">Buscar</label>
+          <div class="search-control">
+            <input id="extra-search" pInputText type="text" [(ngModel)]="searchTerm" placeholder="Nombre del extra" />
+            @if (searchTerm) {
+              <button pButton type="button" icon="pi pi-times" severity="secondary" [text]="true" (click)="clearSearch()"></button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Estado</span>
+          <div class="filter-actions">
+            @for (f of statusFilters; track f.value) {
+              <button pButton type="button" [label]="f.label" size="small" severity="secondary" [outlined]="statusFilter !== f.value" (click)="setStatusFilter(f.value)"></button>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (error) {
+        <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+      }
+
+      @if (loading) {
+        <div class="loading-state">
+          <p-progress-spinner strokeWidth="4" animationDuration=".6s" ariaLabel="Cargando" />
+          <p>Cargando extras...</p>
+        </div>
+      } @else if (error && extras.length === 0) {
+        <div class="error-state">
+          <div class="error-icon"><i class="pi pi-exclamation-triangle"></i></div>
+          <h2>No se pudo cargar el listado</h2>
+          <p>{{ error }}</p>
+          <button pButton type="button" icon="pi pi-refresh" label="Reintentar" (click)="load()"></button>
+        </div>
+      } @else if (filtered.length > 0) {
+        <p-table [value]="filtered" [rows]="8" [rowHover]="true" [paginator]="filtered.length > 8" dataKey="id">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Extra</th>
+              <th>Precio</th>
+              <th>Estado</th>
+              <th class="actions-column">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-e>
+            <tr>
+              <td><strong>{{ e.name }}</strong></td>
+              <td><span class="price-cell">{{ e.price | number:'1.0-0' }}</span></td>
+              <td>
+                <p-tag [value]="e.active ? 'Activo' : 'Inactivo'" [severity]="e.active ? 'success' : 'secondary'"></p-tag>
+              </td>
+              <td class="actions-column">
+                <div class="row-actions">
+                  <button pButton type="button" [routerLink]="['/extras', e.id, 'editar']" icon="pi pi-pencil" label="Editar" severity="secondary" [text]="true" [disabled]="pendingId === e.id"></button>
+                  @if (e.active) {
+                    <button pButton type="button" icon="pi pi-trash" label="Desactivar" severity="danger" [text]="true" [loading]="pendingId === e.id" [disabled]="pendingId === e.id" (click)="toggle(e, false)"></button>
+                  } @else {
+                    <button pButton type="button" icon="pi pi-refresh" label="Activar" severity="success" [text]="true" [loading]="pendingId === e.id" [disabled]="pendingId === e.id" (click)="toggle(e, true)"></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon"><i class="pi pi-plus-circle"></i></div>
+          <h2>No hay extras para mostrar</h2>
+          <p>Ajust&aacute; los filtros o cre&aacute; un nuevo extra para empezar.</p>
+          <button pButton type="button" routerLink="/extras/nuevo" icon="pi pi-plus" label="Crear extra"></button>
+        </div>
+      }
+    </section>
+  </main>
+</div>

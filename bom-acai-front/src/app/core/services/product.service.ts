@@ -75,10 +75,14 @@ export class ProductService {
 
   private toPresentation(presentation: ProductPresentationApi): ProductPresentation {
     return {
-      id: Number(presentation.id),
-      name: presentation.name,
-      price: Number(presentation.price),
-      active: this.toBoolean(presentation.active),
+      id:          Number(presentation.id),
+      productId:   0,
+      productName: '',
+      name:        presentation.name,
+      price:       Number(presentation.price),
+      imageUrl:    null,
+      imagePath:   null,
+      active:      this.toBoolean(presentation.active),
     };
   }
 

@@ -38,8 +38,38 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'presentaciones',
+    loadComponent: () => import('./features/presentations/presentation-list/presentation-list.component').then(m => m.PresentationListComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'presentaciones/nueva',
+    loadComponent: () => import('./features/presentations/presentation-form/presentation-form.component').then(m => m.PresentationFormComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'presentaciones/:id/editar',
+    loadComponent: () => import('./features/presentations/presentation-form/presentation-form.component').then(m => m.PresentationFormComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'extras',
+    loadComponent: () => import('./features/extras/extra-list/extra-list.component').then(m => m.ExtraListComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'extras/nuevo',
+    loadComponent: () => import('./features/extras/extra-form/extra-form.component').then(m => m.ExtraFormComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'extras/:id/editar',
+    loadComponent: () => import('./features/extras/extra-form/extra-form.component').then(m => m.ExtraFormComponent),
     canActivate: [authGuard]
   },
   {

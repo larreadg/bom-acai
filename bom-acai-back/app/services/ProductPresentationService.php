@@ -44,6 +44,30 @@ class ProductPresentationService
         return $stmt->fetch();
     }
 
+    public function existsByNameAndProduct(string $name, int $productId, ?int $excludeId = null): bool
+    {
+        $sql    = 'SELECT 1 FROM "product_presentations"
+                   WHERE LOWER("name") = LOWER(?) AND "product_id" = ?';
+        $values = [$name, $productId];
+
+        if ($excludeId !== null) {
+            $sql    .= ' AND "id" <> ?';
+            $values[] = $excludeId;
+        }
+
+        $stmt = $this->db->prepare($sql . ' LIMIT 1');
+        $stmt->execute($values);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function productExists(int $productId): bool
+    {
+        $stmt = $this->db->prepare('SELECT 1 FROM "products" WHERE "id" = ? LIMIT 1');
+        $stmt->execute([$productId]);
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function create(array $data): int|false
     {
         $stmt = $this->db->prepare(

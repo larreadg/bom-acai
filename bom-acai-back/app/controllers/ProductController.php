@@ -30,13 +30,42 @@ class ProductController
 
     public function store(): void
     {
-        $body        = Flight::request()->data->getData();
-        $name        = trim($body['name'] ?? '');
-        $categoryId  = $body['category_id'] ?? null;
+        $body       = Flight::request()->data->getData();
+        $name       = trim($body['name']       ?? '');
+        $categoryId = $body['category_id']     ?? null;
 
-        if ($name === '' || $categoryId === null) {
-            ApiResponse::error('name and category_id are required', 400)->send();
+        if ($name === '') {
+            ApiResponse::error('name is required', 400)->send();
             return;
+        }
+
+        if (strlen($name) > 80) {
+            ApiResponse::error('name must not exceed 80 characters', 400)->send();
+            return;
+        }
+
+        if ($categoryId === null) {
+            ApiResponse::error('category_id is required', 400)->send();
+            return;
+        }
+
+        if (!$this->service->categoryExists((int) $categoryId)) {
+            ApiResponse::error('Category not found', 404)->send();
+            return;
+        }
+
+        if ($this->service->existsByName($name)) {
+            ApiResponse::error('Product name already exists', 409)->send();
+            return;
+        }
+
+        $body['name']        = $name;
+        $body['category_id'] = (int) $categoryId;
+
+        // Trim description if present
+        if (array_key_exists('description', $body)) {
+            $desc              = trim((string) ($body['description'] ?? ''));
+            $body['description'] = $desc !== '' ? $desc : null;
         }
 
         $id = $this->service->create($body);
@@ -57,7 +86,43 @@ class ProductController
         }
 
         $body = Flight::request()->data->getData();
-        $ok   = $this->service->update($id, $body);
+
+        if (array_key_exists('name', $body)) {
+            $name = trim((string) $body['name']);
+
+            if ($name === '') {
+                ApiResponse::error('name is required', 400)->send();
+                return;
+            }
+
+            if (strlen($name) > 80) {
+                ApiResponse::error('name must not exceed 80 characters', 400)->send();
+                return;
+            }
+
+            if ($this->service->existsByName($name, $id)) {
+                ApiResponse::error('Product name already exists', 409)->send();
+                return;
+            }
+
+            $body['name'] = $name;
+        }
+
+        if (isset($body['category_id'])) {
+            if (!$this->service->categoryExists((int) $body['category_id'])) {
+                ApiResponse::error('Category not found', 404)->send();
+                return;
+            }
+
+            $body['category_id'] = (int) $body['category_id'];
+        }
+
+        if (array_key_exists('description', $body)) {
+            $desc                = trim((string) ($body['description'] ?? ''));
+            $body['description'] = $desc !== '' ? $desc : null;
+        }
+
+        $ok = $this->service->update($id, $body);
 
         if (!$ok) {
             ApiResponse::error('No changes applied', 400)->send();

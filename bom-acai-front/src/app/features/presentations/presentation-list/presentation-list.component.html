@@ -1,0 +1,239 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Presentaciones del cat&aacute;logo</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button
+        pButton
+        type="button"
+        routerLink="/"
+        icon="pi pi-home"
+        label="Inicio"
+        severity="secondary"
+        [outlined]="true"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-sign-out"
+        label="Cerrar sesi&oacute;n"
+        severity="secondary"
+        [text]="true"
+        (click)="auth.logout()"
+      ></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">Cat&aacute;logo</span>
+        <h1>Presentaciones</h1>
+        <p>
+          Gestion&aacute; los tama&ntilde;os y variantes de cada producto &mdash; isopores, vasos, paletas, cucuruchos &mdash;
+          con sus precios e im&aacute;genes para el punto de venta.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button
+          pButton
+          type="button"
+          routerLink="/presentaciones/nueva"
+          icon="pi pi-plus"
+          label="Nueva presentaci&oacute;n"
+        ></button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Total</span>
+        <strong>{{ totalCount }}</strong>
+        <small>presentaciones registradas</small>
+      </article>
+
+      <article class="stat-card stat-card--accent">
+        <span class="stat-label">Activas</span>
+        <strong>{{ activeCount }}</strong>
+        <small>disponibles en el men&uacute;</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Inactivas</span>
+        <strong>{{ inactiveCount }}</strong>
+        <small>pausadas sin perder historial</small>
+      </article>
+    </section>
+
+    <section class="table-card">
+      <div class="toolbar">
+        <div class="search-group">
+          <label for="pres-search">Buscar</label>
+          <div class="search-control">
+            <input
+              id="pres-search"
+              pInputText
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Nombre o producto"
+            />
+            @if (searchTerm) {
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                severity="secondary"
+                [text]="true"
+                (click)="clearSearch()"
+              ></button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Estado</span>
+          <div class="filter-actions">
+            @for (f of statusFilters; track f.value) {
+              <button
+                pButton
+                type="button"
+                [label]="f.label"
+                size="small"
+                severity="secondary"
+                [outlined]="statusFilter !== f.value"
+                (click)="setStatusFilter(f.value)"
+              ></button>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (error) {
+        <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+      }
+
+      @if (loading) {
+        <div class="loading-state">
+          <p-progress-spinner strokeWidth="4" animationDuration=".6s" ariaLabel="Cargando" />
+          <p>Cargando presentaciones...</p>
+        </div>
+      } @else if (error && presentations.length === 0) {
+        <div class="error-state">
+          <div class="error-icon"><i class="pi pi-exclamation-triangle"></i></div>
+          <h2>No se pudo cargar el listado</h2>
+          <p>{{ error }}</p>
+          <button pButton type="button" icon="pi pi-refresh" label="Reintentar" (click)="load()"></button>
+        </div>
+      } @else if (filtered.length > 0) {
+        <p-table
+          [value]="filtered"
+          [rows]="8"
+          [rowHover]="true"
+          [paginator]="filtered.length > 8"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Presentaci&oacute;n</th>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Imagen</th>
+              <th>Estado</th>
+              <th class="actions-column">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-p>
+            <tr>
+              <td><strong>{{ p.name }}</strong></td>
+
+              <td><span class="product-pill">{{ p.productName }}</span></td>
+
+              <td>
+                <span class="price-cell">{{ p.price | number:'1.0-0' }}</span>
+              </td>
+
+              <td>
+                @if (p.imagePath) {
+                  <div class="image-thumb">
+                    <img [src]="apiUrl + '/' + p.imagePath" [alt]="p.name" />
+                  </div>
+                } @else {
+                  <span class="no-image"><i class="pi pi-image"></i> Sin imagen</span>
+                }
+              </td>
+
+              <td>
+                <p-tag
+                  [value]="p.active ? 'Activa' : 'Inactiva'"
+                  [severity]="p.active ? 'success' : 'secondary'"
+                ></p-tag>
+              </td>
+
+              <td class="actions-column">
+                <div class="row-actions">
+                  <button
+                    pButton
+                    type="button"
+                    [routerLink]="['/presentaciones', p.id, 'editar']"
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    severity="secondary"
+                    [text]="true"
+                    [disabled]="pendingId === p.id"
+                  ></button>
+
+                  @if (p.active) {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      label="Desactivar"
+                      severity="danger"
+                      [text]="true"
+                      [loading]="pendingId === p.id"
+                      [disabled]="pendingId === p.id"
+                      (click)="toggle(p, false)"
+                    ></button>
+                  } @else {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-refresh"
+                      label="Activar"
+                      severity="success"
+                      [text]="true"
+                      [loading]="pendingId === p.id"
+                      [disabled]="pendingId === p.id"
+                      (click)="toggle(p, true)"
+                    ></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon"><i class="pi pi-objects-column"></i></div>
+          <h2>No hay presentaciones para mostrar</h2>
+          <p>Ajust&aacute; los filtros o cre&aacute; una nueva presentaci&oacute;n para empezar.</p>
+          <button
+            pButton
+            type="button"
+            routerLink="/presentaciones/nueva"
+            icon="pi pi-plus"
+            label="Crear presentaci&oacute;n"
+          ></button>
+        </div>
+      }
+    </section>
+  </main>
+</div>

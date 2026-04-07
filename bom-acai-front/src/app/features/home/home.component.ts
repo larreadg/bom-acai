@@ -29,6 +29,13 @@ export class HomeComponent {
       note: 'Pr\u00f3ximamente',
     },
     {
+      title: 'Presentaciones',
+      icon: 'pi pi-objects-column',
+      route: '/presentaciones',
+      available: true,
+      note: 'Tama\u00f1os \u00b7 Precios \u00b7 Im\u00e1genes',
+    },
+    {
       title: 'Productos',
       icon: 'pi pi-box',
       route: '/productos',
@@ -45,8 +52,9 @@ export class HomeComponent {
     {
       title: 'Extras',
       icon: 'pi pi-plus-circle',
-      available: false,
-      note: 'Pr\u00f3ximamente',
+      route: '/extras',
+      available: true,
+      note: 'Toppings \u00b7 Agregados \u00b7 Precios',
     },
   ];
 

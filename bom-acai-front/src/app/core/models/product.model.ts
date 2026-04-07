@@ -1,8 +1,21 @@
 export interface ProductPresentation {
   id: number;
+  productId: number;
+  productName: string;
+  name: string;
+  price: number;
+  imageUrl: string | null;
+  imagePath: string | null;
+  active: boolean;
+}
+
+export interface PresentationFormPayload {
+  productId: number;
   name: string;
   price: number;
   active: boolean;
+  imageFile: File | null;
+  removeImage: boolean;
 }
 
 export interface Product {
