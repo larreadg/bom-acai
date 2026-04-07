@@ -1,0 +1,15 @@
+@use "primeflex/primeflex.scss";
+@use "primeicons/primeicons.css";
+
+body {
+    margin: 0;
+    font-family: 'Google Sans', sans-serif;
+    font-optical-sizing: auto;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+}

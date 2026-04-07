@@ -1,0 +1,70 @@
+<?php
+
+declare(strict_types=1);
+
+class ExtraService
+{
+    private \PDO $db;
+
+    public function __construct()
+    {
+        $this->db = Database::connection();
+    }
+
+    public function getAll(): array
+    {
+        return $this->db
+            ->query('SELECT * FROM "extras" ORDER BY "name" ASC')
+            ->fetchAll();
+    }
+
+    public function getById(int $id): array|false
+    {
+        $stmt = $this->db->prepare('SELECT * FROM "extras" WHERE "id" = ? LIMIT 1');
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    public function create(array $data): int|false
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO "extras" ("name", "price", "active") VALUES (?, ?, ?)'
+        );
+
+        $ok = $stmt->execute([
+            $data['name'],
+            $data['price'],
+            $data['active'] ?? 1,
+        ]);
+
+        return $ok ? (int) $this->db->lastInsertId() : false;
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $fields = [];
+        $values = [];
+
+        if (isset($data['name']))   { $fields[] = '"name" = ?';   $values[] = $data['name']; }
+        if (isset($data['price']))  { $fields[] = '"price" = ?';  $values[] = $data['price']; }
+        if (isset($data['active'])) { $fields[] = '"active" = ?'; $values[] = $data['active']; }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $values[] = $id;
+
+        $stmt = $this->db->prepare(
+            'UPDATE "extras" SET ' . implode(', ', $fields) . ' WHERE "id" = ?'
+        );
+
+        return $stmt->execute($values) && $stmt->rowCount() > 0;
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->db->prepare('UPDATE "extras" SET "active" = 0 WHERE "id" = ?');
+        return $stmt->execute([$id]) && $stmt->rowCount() > 0;
+    }
+}

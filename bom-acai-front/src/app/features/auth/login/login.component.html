@@ -1,0 +1,47 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="login-logo" />
+      <h1 class="login-title">Bom Aca&iacute;</h1>
+      <p class="login-subtitle">Sistema de pedidos</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="field">
+        <label for="username">Usuario</label>
+        <input
+          id="username"
+          pInputText
+          formControlName="username"
+          placeholder="Ingres&aacute; tu usuario"
+          autocomplete="username"
+          [class.ng-invalid]="form.get('username')?.invalid && form.get('username')?.touched"
+        />
+      </div>
+
+      <div class="field">
+        <label for="password">Contrase&ntilde;a</label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          placeholder="Ingres&aacute; tu contrase&ntilde;a"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        class="w-full"
+        label="Iniciar sesi&oacute;n"
+        icon="pi pi-sign-in"
+        [loading]="loading"
+        [disabled]="form.invalid || loading"
+      ></button>
+    </form>
+  </div>
+</div>

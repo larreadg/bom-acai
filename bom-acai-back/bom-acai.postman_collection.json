@@ -1,0 +1,266 @@
+{
+  "info": {
+    "name": "Bom Acaí API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/bom-acai-back", "type": "string" },
+    { "key": "token",    "value": "",                                "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "    pm.collectionVariables.set('token', json.data.token);",
+                  "    console.log('Token saved:', json.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"larreadg\",\n  \"password\": \"Diego.2026\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get all categories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/categories", "host": ["{{base_url}}"], "path": ["api", "categories"] }
+          }
+        },
+        {
+          "name": "Get category by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/categories/1", "host": ["{{base_url}}"], "path": ["api", "categories", "1"] }
+          }
+        },
+        {
+          "name": "Create category",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Helados\",\n  \"description\": \"Helados artesanales\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/categories", "host": ["{{base_url}}"], "path": ["api", "categories"] }
+          }
+        },
+        {
+          "name": "Update category",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Helados\",\n  \"description\": \"Descripción actualizada\",\n  \"active\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/categories/1", "host": ["{{base_url}}"], "path": ["api", "categories", "1"] }
+          }
+        },
+        {
+          "name": "Delete category",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/categories/1", "host": ["{{base_url}}"], "path": ["api", "categories", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get all products",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/products", "host": ["{{base_url}}"], "path": ["api", "products"] }
+          }
+        },
+        {
+          "name": "Get product by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/products/1", "host": ["{{base_url}}"], "path": ["api", "products", "1"] }
+          }
+        },
+        {
+          "name": "Create product",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": 1,\n  \"name\": \"Helado de Chocolate\",\n  \"description\": \"Helado artesanal de chocolate\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/products", "host": ["{{base_url}}"], "path": ["api", "products"] }
+          }
+        },
+        {
+          "name": "Update product",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Helado de Chocolate\",\n  \"description\": \"Descripción actualizada\",\n  \"active\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/products/1", "host": ["{{base_url}}"], "path": ["api", "products", "1"] }
+          }
+        },
+        {
+          "name": "Delete product",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/products/1", "host": ["{{base_url}}"], "path": ["api", "products", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Presentations",
+      "item": [
+        {
+          "name": "Get all presentations",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/presentations", "host": ["{{base_url}}"], "path": ["api", "presentations"] }
+          }
+        },
+        {
+          "name": "Get presentation by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/presentations/1", "host": ["{{base_url}}"], "path": ["api", "presentations", "1"] }
+          }
+        },
+        {
+          "name": "Get presentations by product",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/products/1/presentations", "host": ["{{base_url}}"], "path": ["api", "products", "1", "presentations"] }
+          }
+        },
+        {
+          "name": "Create presentation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"name\": \"Isopor 1/4 kg\",\n  \"price\": 15000,\n  \"image_url\": null,\n  \"image_path\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/presentations", "host": ["{{base_url}}"], "path": ["api", "presentations"] }
+          }
+        },
+        {
+          "name": "Update presentation",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Isopor 1/4 kg\",\n  \"price\": 18000,\n  \"image_url\": \"https://cdn.example.com/img/isopor-1-4.jpg\",\n  \"image_path\": \"/uploads/presentations/isopor-1-4.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/presentations/1", "host": ["{{base_url}}"], "path": ["api", "presentations", "1"] }
+          }
+        },
+        {
+          "name": "Delete presentation",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/presentations/1", "host": ["{{base_url}}"], "path": ["api", "presentations", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Extras",
+      "item": [
+        {
+          "name": "Get all extras",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/extras", "host": ["{{base_url}}"], "path": ["api", "extras"] }
+          }
+        },
+        {
+          "name": "Get extra by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/extras/1", "host": ["{{base_url}}"], "path": ["api", "extras", "1"] }
+          }
+        },
+        {
+          "name": "Create extra",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Leche en polvo\",\n  \"price\": 2000\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/extras", "host": ["{{base_url}}"], "path": ["api", "extras"] }
+          }
+        },
+        {
+          "name": "Update extra",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Leche en polvo\",\n  \"price\": 2500,\n  \"active\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/extras/1", "host": ["{{base_url}}"], "path": ["api", "extras", "1"] }
+          }
+        },
+        {
+          "name": "Delete extra",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/extras/1", "host": ["{{base_url}}"], "path": ["api", "extras", "1"] }
+          }
+        }
+      ]
+    }
+  ]
+}

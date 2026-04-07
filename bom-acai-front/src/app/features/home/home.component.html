@@ -1,0 +1,54 @@
+<div class="layout">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="navbar-logo" />
+      <span class="navbar-title">Bom Aca&iacute;</span>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      label="Cerrar sesi&oacute;n"
+      icon="pi pi-sign-out"
+      severity="secondary"
+      [text]="true"
+      (click)="auth.logout()"
+    ></button>
+  </nav>
+
+  <main class="content">
+    <div class="welcome-card">
+      <div class="welcome-icon">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <h2>&iexcl;Bienvenido!</h2>
+      <p>Sistema de pedidos de Bom Aca&iacute;</p>
+    </div>
+
+    <div class="modules-grid">
+      @for (module of modules; track module.title) {
+        <div
+          class="module-card"
+          [class.module-card--available]="module.available"
+          [class.module-card--disabled]="!module.available"
+          [routerLink]="module.route ?? null"
+          [attr.role]="module.available ? 'link' : null"
+          [attr.tabindex]="module.available ? 0 : null"
+        >
+          <div class="module-icon">
+            <i [class]="module.icon"></i>
+          </div>
+
+          <div class="module-copy">
+            <span>{{ module.title }}</span>
+            <small>{{ module.note }}</small>
+          </div>
+
+          @if (module.available) {
+            <i class="pi pi-arrow-up-right module-arrow"></i>
+          }
+        </div>
+      }
+    </div>
+  </main>
+</div>

@@ -1,0 +1,247 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Administraci&oacute;n de categor&iacute;as</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button
+        pButton
+        type="button"
+        routerLink="/"
+        icon="pi pi-home"
+        label="Inicio"
+        severity="secondary"
+        [outlined]="true"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-sign-out"
+        label="Cerrar sesi&oacute;n"
+        severity="secondary"
+        [text]="true"
+        (click)="auth.logout()"
+      ></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">Cat&aacute;logo</span>
+        <h1>Categor&iacute;as</h1>
+        <p>
+          Gestion&aacute; el listado principal del men&uacute;, activ&aacute; o desactiv&aacute; categor&iacute;as y manten&eacute;
+          ordenado el cat&aacute;logo para productos y pedidos.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button
+          pButton
+          type="button"
+          routerLink="/categorias/nueva"
+          icon="pi pi-plus"
+          label="Nueva categor&iacute;a"
+        ></button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Total</span>
+        <strong>{{ totalCount }}</strong>
+        <small>categor&iacute;as registradas</small>
+      </article>
+
+      <article class="stat-card stat-card--accent">
+        <span class="stat-label">Activas</span>
+        <strong>{{ activeCount }}</strong>
+        <small>disponibles para usar</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Inactivas</span>
+        <strong>{{ inactiveCount }}</strong>
+        <small>desactivadas sin borrar historial</small>
+      </article>
+    </section>
+
+    <section class="table-card">
+      <div class="toolbar">
+        <div class="search-group">
+          <label for="category-search">Buscar</label>
+          <div class="search-control">
+            <input
+              id="category-search"
+              pInputText
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Nombre o descripci&oacute;n"
+            />
+
+            @if (searchTerm) {
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                severity="secondary"
+                [text]="true"
+                (click)="clearSearch()"
+              ></button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Estado</span>
+
+          <div class="filter-actions">
+            @for (filter of statusFilters; track filter.value) {
+              <button
+                pButton
+                type="button"
+                [label]="filter.label"
+                size="small"
+                severity="secondary"
+                [outlined]="statusFilter !== filter.value"
+                (click)="setStatusFilter(filter.value)"
+              ></button>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (error) {
+        <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+      }
+
+      @if (loading) {
+        <div class="loading-state">
+          <p-progress-spinner
+            strokeWidth="4"
+            animationDuration=".6s"
+            ariaLabel="Cargando categor&iacute;as"
+          />
+          <p>Cargando categor&iacute;as...</p>
+        </div>
+      } @else if (error && categories.length === 0) {
+        <div class="error-state">
+          <div class="error-icon">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+          <h2>No se pudo cargar el listado</h2>
+          <p>{{ error }}</p>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-refresh"
+            label="Reintentar"
+            (click)="loadCategories()"
+          ></button>
+        </div>
+      } @else if (filteredCategories.length > 0) {
+        <p-table
+          [value]="filteredCategories"
+          [rows]="8"
+          [rowHover]="true"
+          [paginator]="filteredCategories.length > 8"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Nombre</th>
+              <th>Descripci&oacute;n</th>
+              <th>Estado</th>
+              <th class="actions-column">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-category>
+            <tr>
+              <td>
+                <div class="name-cell">
+                  <strong>{{ category.name }}</strong>
+                </div>
+              </td>
+
+              <td>
+                <span class="description-cell">
+                  {{ category.description || 'Sin descripci&oacute;n.' }}
+                </span>
+              </td>
+
+              <td>
+                <p-tag
+                  [value]="category.active ? 'Activa' : 'Inactiva'"
+                  [severity]="category.active ? 'success' : 'secondary'"
+                ></p-tag>
+              </td>
+
+              <td class="actions-column">
+                <div class="row-actions">
+                  <button
+                    pButton
+                    type="button"
+                    [routerLink]="['/categorias', category.id, 'editar']"
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    severity="secondary"
+                    [text]="true"
+                    [disabled]="pendingCategoryId === category.id"
+                  ></button>
+
+                  @if (category.active) {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      label="Desactivar"
+                      severity="danger"
+                      [text]="true"
+                      [loading]="pendingCategoryId === category.id"
+                      [disabled]="pendingCategoryId === category.id"
+                      (click)="toggleCategoryStatus(category, false)"
+                    ></button>
+                  } @else {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-refresh"
+                      label="Activar"
+                      severity="success"
+                      [text]="true"
+                      [loading]="pendingCategoryId === category.id"
+                      [disabled]="pendingCategoryId === category.id"
+                      (click)="toggleCategoryStatus(category, true)"
+                    ></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="pi pi-tags"></i>
+          </div>
+          <h2>No hay categor&iacute;as para mostrar</h2>
+          <p>Ajust&aacute; los filtros o cre&aacute; una nueva categor&iacute;a para empezar.</p>
+          <button
+            pButton
+            type="button"
+            routerLink="/categorias/nueva"
+            icon="pi pi-plus"
+            label="Crear categor&iacute;a"
+          ></button>
+        </div>
+      }
+    </section>
+  </main>
+</div>
