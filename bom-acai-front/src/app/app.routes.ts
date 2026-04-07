@@ -23,6 +23,21 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'productos',
+    loadComponent: () => import('./features/products/product-list/product-list.component').then(m => m.ProductListComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'productos/nuevo',
+    loadComponent: () => import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'productos/:id/editar',
+    loadComponent: () => import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard]

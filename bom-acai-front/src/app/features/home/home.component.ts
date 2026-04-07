@@ -31,8 +31,9 @@ export class HomeComponent {
     {
       title: 'Productos',
       icon: 'pi pi-box',
-      available: false,
-      note: 'Pr\u00f3ximamente',
+      route: '/productos',
+      available: true,
+      note: 'Disponible',
     },
     {
       title: 'Categor\u00edas',

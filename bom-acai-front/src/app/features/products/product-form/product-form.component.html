@@ -1,0 +1,202 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Configuraci&oacute;n de productos</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button
+        pButton
+        type="button"
+        routerLink="/productos"
+        icon="pi pi-arrow-left"
+        label="Volver"
+        severity="secondary"
+        [outlined]="true"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-sign-out"
+        label="Cerrar sesi&oacute;n"
+        severity="secondary"
+        [text]="true"
+        (click)="auth.logout()"
+      ></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">{{ isEditMode ? 'Edici&oacute;n' : 'Alta' }}</span>
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+      </div>
+    </section>
+
+    @if (error) {
+      <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+    }
+
+    @if (loading) {
+      <section class="loading-card">
+        <p-progress-spinner
+          strokeWidth="4"
+          animationDuration=".6s"
+          ariaLabel="Cargando producto"
+        />
+        <p>Cargando producto...</p>
+      </section>
+    } @else if (!pageReady) {
+      <section class="error-card">
+        <div class="error-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <h2>No se pudo abrir el producto</h2>
+        <p>{{ error || 'El producto solicitado no est&aacute; disponible.' }}</p>
+        <button
+          pButton
+          type="button"
+          routerLink="/productos"
+          icon="pi pi-arrow-left"
+          label="Volver al listado"
+        ></button>
+      </section>
+    } @else if (!hasCategories) {
+      <section class="error-card">
+        <div class="error-icon">
+          <i class="pi pi-tags"></i>
+        </div>
+        <h2>Primero cre&aacute; una categor&iacute;a</h2>
+        <p>Los productos necesitan una categor&iacute;a asociada antes de poder guardarse.</p>
+        <button
+          pButton
+          type="button"
+          routerLink="/categorias/nueva"
+          icon="pi pi-plus"
+          label="Nueva categor&iacute;a"
+        ></button>
+      </section>
+    } @else {
+      <div class="editor-grid">
+        <section class="form-card">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <div class="field">
+              <label for="categoryId">Categor&iacute;a</label>
+              <p-select
+                inputId="categoryId"
+                formControlName="categoryId"
+                [options]="categories"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Seleccion&aacute; una categor&iacute;a"
+                [filter]="true"
+                filterBy="name"
+                class="w-full"
+                [invalid]="isFieldInvalid('categoryId')"
+              ></p-select>
+
+              @if (isFieldInvalid('categoryId')) {
+                <small class="field-error">La categor&iacute;a es obligatoria.</small>
+              }
+            </div>
+
+            <div class="field">
+              <label for="name">Nombre</label>
+              <input
+                id="name"
+                pInputText
+                type="text"
+                formControlName="name"
+                placeholder="Ej. Aca&iacute;, Helado, Coca Cola"
+                [class.ng-invalid]="isFieldInvalid('name')"
+              />
+
+              @if (isFieldInvalid('name')) {
+                <small class="field-error">El nombre es obligatorio.</small>
+              }
+            </div>
+
+            <div class="field">
+              <label for="description">Descripci&oacute;n</label>
+              <textarea
+                id="description"
+                pInputTextarea
+                rows="6"
+                formControlName="description"
+                placeholder="Describ&iacute; brevemente el producto."
+                [autoResize]="true"
+                [class.ng-invalid]="isFieldInvalid('description')"
+              ></textarea>
+
+              @if (isFieldInvalid('description')) {
+                <small class="field-error">La descripci&oacute;n es demasiado larga.</small>
+              }
+            </div>
+
+            <div class="toggle-row">
+              <p-checkbox
+                inputId="active"
+                formControlName="active"
+                [binary]="true"
+              ></p-checkbox>
+              <div>
+                <label for="active">Producto activo</label>
+                <p>Si lo desactiv&aacute;s, deja de estar disponible sin perder historial.</p>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button
+                pButton
+                type="button"
+                routerLink="/productos"
+                label="Cancelar"
+                severity="secondary"
+                [outlined]="true"
+                [disabled]="saving"
+              ></button>
+              <button
+                pButton
+                type="submit"
+                [label]="submitLabel"
+                icon="pi pi-save"
+                [loading]="saving"
+                [disabled]="saving"
+              ></button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="summary-card">
+          <span class="summary-label">Vista previa</span>
+          <h2>{{ previewName }}</h2>
+          <p>{{ previewDescription }}</p>
+
+          <div class="summary-row">
+            <span>Categor&iacute;a</span>
+            <strong>{{ previewCategoryName }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Presentaciones activas</span>
+            <strong>{{ presentationsCount }}</strong>
+          </div>
+
+          <div class="summary-status">
+            <span>Estado</span>
+            <p-tag
+              [value]="previewActive ? 'Activo' : 'Inactivo'"
+              [severity]="previewActive ? 'success' : 'secondary'"
+            ></p-tag>
+          </div>
+        </aside>
+      </div>
+    }
+  </main>
+</div>

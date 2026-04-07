@@ -1,0 +1,252 @@
+<div class="page-shell">
+  <nav class="topbar">
+    <div class="brand" routerLink="/">
+      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
+      <div>
+        <span class="brand-title">Bom Aca&iacute;</span>
+        <p class="brand-subtitle">Administraci&oacute;n de productos</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button
+        pButton
+        type="button"
+        routerLink="/"
+        icon="pi pi-home"
+        label="Inicio"
+        severity="secondary"
+        [outlined]="true"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-sign-out"
+        label="Cerrar sesi&oacute;n"
+        severity="secondary"
+        [text]="true"
+        (click)="auth.logout()"
+      ></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">Cat&aacute;logo</span>
+        <h1>Productos</h1>
+        <p>
+          Organiz&aacute; el cat&aacute;logo principal, asign&aacute; cada producto a su categor&iacute;a y manten&eacute;
+          disponible solo lo que hoy se puede vender.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button
+          pButton
+          type="button"
+          routerLink="/productos/nuevo"
+          icon="pi pi-plus"
+          label="Nuevo producto"
+        ></button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Total</span>
+        <strong>{{ totalCount }}</strong>
+        <small>productos registrados</small>
+      </article>
+
+      <article class="stat-card stat-card--accent">
+        <span class="stat-label">Activos</span>
+        <strong>{{ activeCount }}</strong>
+        <small>disponibles para vender</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Inactivos</span>
+        <strong>{{ inactiveCount }}</strong>
+        <small>pausados sin borrar historial</small>
+      </article>
+    </section>
+
+    <section class="table-card">
+      <div class="toolbar">
+        <div class="search-group">
+          <label for="product-search">Buscar</label>
+          <div class="search-control">
+            <input
+              id="product-search"
+              pInputText
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Nombre, categor&iacute;a o descripci&oacute;n"
+            />
+
+            @if (searchTerm) {
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                severity="secondary"
+                [text]="true"
+                (click)="clearSearch()"
+              ></button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Estado</span>
+
+          <div class="filter-actions">
+            @for (filter of statusFilters; track filter.value) {
+              <button
+                pButton
+                type="button"
+                [label]="filter.label"
+                size="small"
+                severity="secondary"
+                [outlined]="statusFilter !== filter.value"
+                (click)="setStatusFilter(filter.value)"
+              ></button>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (error) {
+        <p-message severity="error" styleClass="w-full">{{ error }}</p-message>
+      }
+
+      @if (loading) {
+        <div class="loading-state">
+          <p-progress-spinner
+            strokeWidth="4"
+            animationDuration=".6s"
+            ariaLabel="Cargando productos"
+          />
+          <p>Cargando productos...</p>
+        </div>
+      } @else if (error && products.length === 0) {
+        <div class="error-state">
+          <div class="error-icon">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+          <h2>No se pudo cargar el listado</h2>
+          <p>{{ error }}</p>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-refresh"
+            label="Reintentar"
+            (click)="loadProducts()"
+          ></button>
+        </div>
+      } @else if (filteredProducts.length > 0) {
+        <p-table
+          [value]="filteredProducts"
+          [rows]="8"
+          [rowHover]="true"
+          [paginator]="filteredProducts.length > 8"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Producto</th>
+              <th>Categor&iacute;a</th>
+              <th>Descripci&oacute;n</th>
+              <th>Estado</th>
+              <th class="actions-column">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-product>
+            <tr>
+              <td>
+                <div class="name-cell">
+                  <strong>{{ product.name }}</strong>
+                </div>
+              </td>
+
+              <td>
+                <span class="category-pill">{{ product.categoryName }}</span>
+              </td>
+
+              <td>
+                <span class="description-cell">
+                  {{ product.description || 'Sin descripci&oacute;n.' }}
+                </span>
+              </td>
+
+              <td>
+                <p-tag
+                  [value]="product.active ? 'Activo' : 'Inactivo'"
+                  [severity]="product.active ? 'success' : 'secondary'"
+                ></p-tag>
+              </td>
+
+              <td class="actions-column">
+                <div class="row-actions">
+                  <button
+                    pButton
+                    type="button"
+                    [routerLink]="['/productos', product.id, 'editar']"
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    severity="secondary"
+                    [text]="true"
+                    [disabled]="pendingProductId === product.id"
+                  ></button>
+
+                  @if (product.active) {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      label="Desactivar"
+                      severity="danger"
+                      [text]="true"
+                      [loading]="pendingProductId === product.id"
+                      [disabled]="pendingProductId === product.id"
+                      (click)="toggleProductStatus(product, false)"
+                    ></button>
+                  } @else {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-refresh"
+                      label="Activar"
+                      severity="success"
+                      [text]="true"
+                      [loading]="pendingProductId === product.id"
+                      [disabled]="pendingProductId === product.id"
+                      (click)="toggleProductStatus(product, true)"
+                    ></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="pi pi-box"></i>
+          </div>
+          <h2>No hay productos para mostrar</h2>
+          <p>Ajust&aacute; los filtros o cre&aacute; un nuevo producto para empezar.</p>
+          <button
+            pButton
+            type="button"
+            routerLink="/productos/nuevo"
+            icon="pi pi-plus"
+            label="Crear producto"
+          ></button>
+        </div>
+      }
+    </section>
+  </main>
+</div>
