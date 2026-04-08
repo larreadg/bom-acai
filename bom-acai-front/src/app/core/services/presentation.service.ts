@@ -11,7 +11,8 @@ interface PresentationApi {
   product_id: number | string;
   product_name: string;
   name: string;
-  price: number | string;
+  cost_price: number | string;
+  sale_price: number | string;
   image_url: string | null;
   image_path: string | null;
   active: number | string | boolean;
@@ -68,7 +69,8 @@ export class PresentationService {
     const fd = new FormData();
     fd.append('product_id',   String(payload.productId));
     fd.append('name',         payload.name.trim());
-    fd.append('price',        String(payload.price));
+    fd.append('cost_price',   String(payload.costPrice));
+    fd.append('sale_price',   String(payload.salePrice));
     fd.append('active',       payload.active ? '1' : '0');
     fd.append('remove_image', payload.removeImage ? '1' : '0');
 
@@ -85,7 +87,8 @@ export class PresentationService {
       productId:   Number(p.product_id),
       productName: p.product_name,
       name:        p.name,
-      price:       Number(p.price),
+      costPrice:   Number(p.cost_price),
+      salePrice:   Number(p.sale_price),
       imageUrl:    p.image_url  ?? null,
       imagePath:   p.image_path ?? null,
       active:      this.toBool(p.active),

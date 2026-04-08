@@ -26,10 +26,24 @@ export interface OrderItem {
   productName: string;
   presentationName: string;
   quantity: number;
+  unitCost: number;
   unitPrice: number;
   subtotal: number;
   notes: string | null;
   extras: OrderItemExtra[];
+}
+
+export interface OrderSummary {
+  totalOrders: number;
+  totalAmount: number;
+  totalCost: number;
+  totalProfit: number;
+  cancelledOrders: number;
+}
+
+export interface OrderListResult {
+  summary: OrderSummary;
+  orders: Order[];
 }
 
 export interface Order {

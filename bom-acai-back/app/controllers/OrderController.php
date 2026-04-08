@@ -11,6 +11,43 @@ class OrderController
         $this->service = new OrderService();
     }
 
+    public function index(): void
+    {
+        $query    = Flight::request()->query;
+        $filters  = [];
+        $dateFrom = trim((string) ($query['date_from'] ?? ''));
+        $dateTo   = trim((string) ($query['date_to'] ?? ''));
+        $status   = trim((string) ($query['status'] ?? ''));
+
+        if ($dateFrom !== '') $filters['date_from'] = $dateFrom;
+        if ($dateTo   !== '') $filters['date_to']   = $dateTo;
+        if ($status   !== '') $filters['status']    = $status;
+
+        ApiResponse::success('Orders retrieved', $this->service->list($filters))->send();
+    }
+
+    public function cancel(int $id): void
+    {
+        $order = $this->service->getById($id);
+
+        if ($order === false) {
+            ApiResponse::error('Order not found', 404)->send();
+            return;
+        }
+
+        if ($order['status'] === 'cancelled') {
+            ApiResponse::error('Order is already cancelled', 422)->send();
+            return;
+        }
+
+        if (!$this->service->cancel($id)) {
+            ApiResponse::error('Could not cancel order', 500)->send();
+            return;
+        }
+
+        ApiResponse::success('Order cancelled', $this->service->getById($id))->send();
+    }
+
     public function store(): void
     {
         $body = Flight::request()->data->getData();
@@ -83,7 +120,8 @@ class OrderController
             $normalizedItems[] = [
                 'product_presentation_id' => (int) $presentationId,
                 'quantity'                => (int) $quantity,
-                'unit_price'              => (float) $presentation['price'],
+                'unit_cost'               => (float) $presentation['cost_price'],
+                'unit_price'              => (float) $presentation['sale_price'],
                 'notes'                   => $itemNotes !== '' ? $itemNotes : null,
                 'extras'                  => $normalizedExtras,
             ];

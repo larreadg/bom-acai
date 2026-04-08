@@ -25,7 +25,8 @@ import { environment } from '../../../../environments/environment';
 interface PresentationFormValue {
   productId: number | null;
   name:      string;
-  price:     number | null;
+  costPrice: number | null;
+  salePrice: number | null;
   active:    boolean;
 }
 
@@ -78,7 +79,8 @@ export class PresentationFormComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       productId: [null, Validators.required],
       name:      ['',   [Validators.required, Validators.maxLength(80)]],
-      price:     [null, [Validators.required, Validators.min(0)]],
+      costPrice: [null, [Validators.required, Validators.min(0)]],
+      salePrice: [null, [Validators.required, Validators.min(0)]],
       active:    [true],
     });
   }
@@ -109,15 +111,16 @@ export class PresentationFormComponent implements OnInit, OnDestroy {
   get title():  string { return this.isEditMode ? 'Editar presentación' : 'Nueva presentación'; }
   get subtitle(): string {
     return this.isEditMode
-      ? 'Modificá el nombre, precio o imagen de esta variante.'
-      : 'Agregá una variante nueva a un producto: tamaño, precio e imagen para el punto de venta.';
+      ? 'Modificá el nombre, los precios o la imagen de esta variante.'
+      : 'Agregá una variante nueva a un producto con precio de costo, precio de venta e imagen.';
   }
   get submitLabel(): string { return this.isEditMode ? 'Guardar cambios' : 'Crear presentación'; }
   get hasProducts(): boolean { return this.products.length > 0; }
 
-  get previewName():    string  { return this.form.get('name')?.value?.trim()  || 'Nueva presentación'; }
-  get previewPrice():   number  { return this.form.get('price')?.value         ?? 0; }
-  get previewActive(): boolean  { return !!this.form.get('active')?.value; }
+  get previewName():      string { return this.form.get('name')?.value?.trim() || 'Nueva presentación'; }
+  get previewCostPrice(): number { return this.form.get('costPrice')?.value ?? 0; }
+  get previewSalePrice(): number { return this.form.get('salePrice')?.value ?? 0; }
+  get previewActive():    boolean { return !!this.form.get('active')?.value; }
   get previewProductName(): string {
     const id = this.form.get('productId')?.value;
     return this.products.find(p => p.id === id)?.name ?? 'Sin producto seleccionado';
@@ -259,7 +262,8 @@ export class PresentationFormComponent implements OnInit, OnDestroy {
     return {
       productId: p.productId,
       name:      p.name,
-      price:     p.price,
+      costPrice: p.costPrice,
+      salePrice: p.salePrice,
       active:    p.active,
     };
   }
@@ -270,7 +274,8 @@ export class PresentationFormComponent implements OnInit, OnDestroy {
     return {
       productId:   Number(v.productId),
       name:        v.name.trim(),
-      price:       Number(v.price),
+      costPrice:   Number(v.costPrice),
+      salePrice:   Number(v.salePrice),
       active:      !!v.active,
       imageFile:   this.selectedFile,
       removeImage: this.removeImage,
@@ -284,7 +289,8 @@ export class PresentationFormComponent implements OnInit, OnDestroy {
     return (
       a.productId === b.productId &&
       a.name      === b.name      &&
-      a.price     === b.price     &&
+      a.costPrice === b.costPrice &&
+      a.salePrice === b.salePrice &&
       a.active    === b.active
     );
   }

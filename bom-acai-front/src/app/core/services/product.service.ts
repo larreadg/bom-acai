@@ -9,7 +9,8 @@ import { Product, ProductFormPayload, ProductPresentation } from '../models/prod
 interface ProductPresentationApi {
   id: number | string;
   name: string;
-  price: number | string;
+  cost_price: number | string;
+  sale_price: number | string;
   active: number | string | boolean;
 }
 
@@ -79,7 +80,8 @@ export class ProductService {
       productId:   0,
       productName: '',
       name:        presentation.name,
-      price:       Number(presentation.price),
+      costPrice:   Number(presentation.cost_price),
+      salePrice:   Number(presentation.sale_price),
       imageUrl:    null,
       imagePath:   null,
       active:      this.toBoolean(presentation.active),

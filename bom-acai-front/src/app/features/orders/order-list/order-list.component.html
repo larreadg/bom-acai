@@ -1,0 +1,176 @@
+<div class="page-shell">
+  <app-topbar subtitle="Historial de Pedidos" backRoute="/" backLabel="Inicio" backIcon="pi pi-home"></app-topbar>
+
+  <main class="content">
+
+    <!-- Hero -->
+    <div class="hero-card">
+      <span class="hero-eyebrow">Bom Aca&iacute;</span>
+      <h1>Historial de Pedidos</h1>
+      <p>Consult&aacute; y administr&aacute; los pedidos registrados.</p>
+    </div>
+
+    <!-- Summary -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value">{{ summary.totalOrders }}</span>
+        <span class="stat-label">Total pedidos</span>
+      </div>
+      <div class="stat-card stat-card--highlight">
+        <span class="stat-value">{{ formatPrice(summary.totalAmount) }}</span>
+        <span class="stat-label">Facturación</span>
+      </div>
+      <div class="stat-card stat-card--cost">
+        <span class="stat-value">{{ formatPrice(summary.totalCost) }}</span>
+        <span class="stat-label">Costo</span>
+      </div>
+      <div class="stat-card stat-card--profit">
+        <span class="stat-value">{{ formatPrice(summary.totalProfit) }}</span>
+        <span class="stat-label">Ganancia</span>
+      </div>
+      <div class="stat-card stat-card--danger">
+        <span class="stat-value">{{ summary.cancelledOrders }}</span>
+        <span class="stat-label">Cancelados</span>
+      </div>
+    </div>
+
+    <!-- Table card -->
+    <div class="table-card">
+
+      <div class="table-toolbar">
+        <p-selectbutton
+          [(ngModel)]="dateRange"
+          [options]="dateRangeOptions"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onDateRangeChange()"
+        ></p-selectbutton>
+
+        @if (dateRange === 'custom') {
+          <p-datepicker
+            [(ngModel)]="customRange"
+            selectionMode="range"
+            [readonlyInput]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="Desde — Hasta"
+            (onSelect)="onCustomRangeChange()"
+          ></p-datepicker>
+        }
+
+        <span class="toolbar-spacer"></span>
+
+        <button pButton icon="pi pi-file-excel" label="Exportar" severity="success" [outlined]="true"
+          [loading]="exporting" [disabled]="orders.length === 0" (click)="exportExcel()">
+        </button>
+        <button pButton icon="pi pi-refresh" [text]="true" [rounded]="true" severity="secondary" (click)="load()" [loading]="loading"></button>
+      </div>
+
+      <p-table
+        [value]="orders"
+        [loading]="loading"
+        [rowHover]="true"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        paginatorPosition="bottom"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"></th>
+            <th style="width: 9rem">Pedido</th>
+            <th style="width: 11rem">Fecha / Hora</th>
+            <th>Nota</th>
+            <th style="width: 9rem; text-align: right">Total</th>
+            <th style="width: 4rem"></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-order>
+          <tr [class.row--cancelled]="order.status === 'cancelled'">
+            <td>
+              <button type="button" class="row-toggle-btn" (click)="toggleRow(order.id)">
+                <i [class]="isExpanded(order.id) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+              </button>
+            </td>
+            <td class="order-id">#{{ formatOrderId(order.id) }}</td>
+            <td class="order-date">
+              <span>{{ formatDateTime(order.createdAt).date }}</span>
+              <small>{{ formatDateTime(order.createdAt).time }} hs</small>
+            </td>
+            <td class="order-notes">{{ order.notes ?? '—' }}</td>
+            <td class="order-total">{{ formatPrice(order.total) }}</td>
+            <td class="order-actions">
+              @if (order.status !== 'cancelled') {
+                <button pButton type="button" icon="pi pi-times-circle" [text]="true" [rounded]="true"
+                  severity="danger" size="small" pTooltip="Cancelar pedido" tooltipPosition="left"
+                  (click)="confirmCancel(order)">
+                </button>
+              }
+            </td>
+          </tr>
+          @if (isExpanded(order.id)) {
+            <tr class="row-expansion">
+              <td colspan="6">
+                <div class="items-detail">
+                  @for (item of order.items; track item.id) {
+                    <div class="detail-item">
+                      <div class="detail-item__row">
+                        <span class="detail-item__qty">x{{ item.quantity }}</span>
+                        <span class="detail-item__name">{{ item.presentationName }}</span>
+                        <span class="detail-item__price">{{ formatPrice(item.subtotal) }}</span>
+                      </div>
+                      <div class="detail-item__product">{{ item.productName }}</div>
+                      @for (extra of item.extras; track extra.id) {
+                        <div class="detail-item__extra">
+                          <span>+ {{ extra.extraName }}</span>
+                          <span>{{ formatPrice(extra.unitPrice) }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <div class="empty-message">
+                <i class="pi pi-inbox"></i>
+                <span>No hay pedidos para el per&iacute;odo seleccionado.</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </main>
+</div>
+
+<!-- Cancel confirm -->
+<p-dialog
+  [(visible)]="cancelVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!cancelling"
+  header="Cancelar pedido"
+  [style]="{ width: '360px' }"
+  (onHide)="cancelTarget = null"
+>
+  @if (cancelTarget) {
+    <div class="confirm-body">
+      <i class="pi pi-exclamation-triangle confirm-icon"></i>
+      <p>¿Confirmar cancelaci&oacute;n del pedido <strong>#{{ formatOrderId(cancelTarget.id) }}</strong>?</p>
+      <p class="confirm-total">Total: {{ formatPrice(cancelTarget.total) }}</p>
+      <p class="confirm-hint">Esta acci&oacute;n no se puede deshacer.</p>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Volver" severity="secondary" [outlined]="true" [disabled]="cancelling" (click)="cancelTarget = null"></button>
+    <button pButton type="button" label="Cancelar pedido" severity="danger" [loading]="cancelling" (click)="doCancel()"></button>
+  </ng-template>
+</p-dialog>

@@ -40,9 +40,10 @@ class ProductPresentationController
      */
     public function store(): void
     {
-        $name      = trim($_POST['name']   ?? '');
-        $productId = $_POST['product_id']  ?? null;
-        $price     = $_POST['price']       ?? null;
+        $name      = trim($_POST['name'] ?? '');
+        $productId = $_POST['product_id'] ?? null;
+        $costPrice = $_POST['cost_price'] ?? null;
+        $salePrice = $_POST['sale_price'] ?? null;
         $active    = isset($_POST['active']) ? (int) $_POST['active'] : 1;
 
         if ($name === '') {
@@ -67,8 +68,13 @@ class ProductPresentationController
             return;
         }
 
-        if ($price === null || !is_numeric($price) || (float) $price < 0) {
-            ApiResponse::error('price must be a number >= 0', 400)->send();
+        if ($costPrice === null || !is_numeric($costPrice) || (float) $costPrice < 0) {
+            ApiResponse::error('cost_price must be a number >= 0', 400)->send();
+            return;
+        }
+
+        if ($salePrice === null || !is_numeric($salePrice) || (float) $salePrice < 0) {
+            ApiResponse::error('sale_price must be a number >= 0', 400)->send();
             return;
         }
 
@@ -80,7 +86,8 @@ class ProductPresentationController
         $data = [
             'product_id' => $productId,
             'name'       => $name,
-            'price'      => (float) $price,
+            'cost_price' => (float) $costPrice,
+            'sale_price' => (float) $salePrice,
             'image_path' => null,
             'active'     => $active,
         ];
@@ -144,15 +151,26 @@ class ProductPresentationController
             $data['product_id'] = $productId;
         }
 
-        if (isset($_POST['price'])) {
-            $price = $_POST['price'];
+        if (isset($_POST['cost_price'])) {
+            $costPrice = $_POST['cost_price'];
 
-            if (!is_numeric($price) || (float) $price < 0) {
-                ApiResponse::error('price must be a number >= 0', 400)->send();
+            if (!is_numeric($costPrice) || (float) $costPrice < 0) {
+                ApiResponse::error('cost_price must be a number >= 0', 400)->send();
                 return;
             }
 
-            $data['price'] = (float) $price;
+            $data['cost_price'] = (float) $costPrice;
+        }
+
+        if (isset($_POST['sale_price'])) {
+            $salePrice = $_POST['sale_price'];
+
+            if (!is_numeric($salePrice) || (float) $salePrice < 0) {
+                ApiResponse::error('sale_price must be a number >= 0', 400)->send();
+                return;
+            }
+
+            $data['sale_price'] = (float) $salePrice;
         }
 
         if (isset($_POST['active'])) {

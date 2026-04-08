@@ -17,7 +17,7 @@ class ProductPresentationService
             'SELECT pp.*, p."name" AS "product_name"
              FROM "product_presentations" pp
              JOIN "products" p ON p."id" = pp."product_id"
-             ORDER BY p."name" ASC, pp."price" ASC'
+             ORDER BY p."name" ASC, pp."sale_price" ASC'
         )->fetchAll();
     }
 
@@ -26,7 +26,7 @@ class ProductPresentationService
         $stmt = $this->db->prepare(
             'SELECT * FROM "product_presentations"
              WHERE "product_id" = ? AND "active" = 1
-             ORDER BY "price" ASC'
+             ORDER BY "sale_price" ASC'
         );
         $stmt->execute([$productId]);
         return $stmt->fetchAll();
@@ -72,14 +72,15 @@ class ProductPresentationService
     {
         $stmt = $this->db->prepare(
             'INSERT INTO "product_presentations"
-                ("product_id", "name", "price", "image_url", "image_path", "active")
-             VALUES (?, ?, ?, ?, ?, ?)'
+                ("product_id", "name", "cost_price", "sale_price", "image_url", "image_path", "active")
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
 
         $ok = $stmt->execute([
             $data['product_id'],
             $data['name'],
-            $data['price'],
+            $data['cost_price'],
+            $data['sale_price'],
             $data['image_url']  ?? null,
             $data['image_path'] ?? null,
             $data['active']     ?? 1,
@@ -95,7 +96,8 @@ class ProductPresentationService
 
         if (isset($data['product_id']))              { $fields[] = '"product_id" = ?';   $values[] = $data['product_id']; }
         if (isset($data['name']))                    { $fields[] = '"name" = ?';          $values[] = $data['name']; }
-        if (isset($data['price']))                   { $fields[] = '"price" = ?';         $values[] = $data['price']; }
+        if (isset($data['cost_price']))              { $fields[] = '"cost_price" = ?';    $values[] = $data['cost_price']; }
+        if (isset($data['sale_price']))              { $fields[] = '"sale_price" = ?';    $values[] = $data['sale_price']; }
         if (array_key_exists('image_url', $data))   { $fields[] = '"image_url" = ?';     $values[] = $data['image_url']; }
         if (array_key_exists('image_path', $data))  { $fields[] = '"image_path" = ?';    $values[] = $data['image_path']; }
         if (isset($data['active']))                  { $fields[] = '"active" = ?';        $values[] = $data['active']; }

@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS "product_presentations" (
     "id"          INTEGER PRIMARY KEY AUTOINCREMENT,
     "product_id"  INTEGER NOT NULL,
     "name"        TEXT    NOT NULL,          -- "isopor 1/4", "vaso 300ml", "cucurucho", etc.
-    "price"       REAL    NOT NULL,
+    "cost_price"  REAL    NOT NULL DEFAULT 0,
+    "sale_price"  REAL    NOT NULL,
     "image_url"   TEXT,                      -- URL pública (CDN / storage externo)
     "image_path"  TEXT,                      -- Path relativo al servidor: /uploads/presentations/xxx.jpg
     "active"      INTEGER NOT NULL DEFAULT 1,
@@ -103,6 +104,7 @@ CREATE TABLE IF NOT EXISTS "order_items" (
     "order_id"                INTEGER NOT NULL,
     "product_presentation_id" INTEGER NOT NULL,
     "quantity"                INTEGER NOT NULL DEFAULT 1,
+    "unit_cost"               REAL    NOT NULL DEFAULT 0, -- costo al momento del pedido
     "unit_price"              REAL    NOT NULL,   -- precio al momento del pedido
     "subtotal"                REAL    NOT NULL,
     "notes"                   TEXT,

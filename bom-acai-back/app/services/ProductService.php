@@ -40,7 +40,7 @@ class ProductService
         $stmt = $this->db->prepare(
             'SELECT * FROM "product_presentations"
              WHERE "product_id" = ? AND "active" = 1
-             ORDER BY "price" ASC'
+             ORDER BY "sale_price" ASC'
         );
         $stmt->execute([$id]);
         $product['presentations'] = $stmt->fetchAll();

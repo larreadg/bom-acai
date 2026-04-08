@@ -58,6 +58,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'historial',
+    loadComponent: () => import('./features/orders/order-list/order-list.component').then(m => m.OrderListComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard]

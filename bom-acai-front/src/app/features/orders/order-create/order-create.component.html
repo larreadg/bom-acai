@@ -162,7 +162,8 @@
             >
               <span class="pres-tag">{{ p.productName }}</span>
               <span class="pres-name">{{ p.name }}</span>
-              <strong class="pres-price">{{ formatPrice(p.price) }}</strong>
+              <strong class="pres-price">{{ formatPrice(p.salePrice) }}</strong>
+              <span class="pres-cost">Costo: {{ formatPrice(p.costPrice) }}</span>
             </button>
           }
         </div>

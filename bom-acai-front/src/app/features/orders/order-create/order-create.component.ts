@@ -107,7 +107,7 @@ export class OrderCreateComponent implements OnInit {
   }
 
   get selectedUnitPrice(): number {
-    return (this.selectedPresentation?.price ?? 0) + this.selectedExtrasTotal;
+    return (this.selectedPresentation?.salePrice ?? 0) + this.selectedExtrasTotal;
   }
 
   get selectedExtrasTotal(): number {
@@ -142,7 +142,7 @@ export class OrderCreateComponent implements OnInit {
             .filter(item => item.active)
             .sort((a, b) => {
               const byProduct = a.productName.localeCompare(b.productName);
-              return byProduct !== 0 ? byProduct : a.price - b.price;
+              return byProduct !== 0 ? byProduct : a.salePrice - b.salePrice;
             });
 
           this.extras = extras
@@ -213,7 +213,7 @@ export class OrderCreateComponent implements OnInit {
           productName: presentation.productName,
           presentationName: presentation.name,
           quantity: 1,
-          unitPrice: presentation.price,
+          unitPrice: presentation.salePrice,
           extras,
         },
       ];

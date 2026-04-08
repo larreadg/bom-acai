@@ -3,7 +3,8 @@ export interface ProductPresentation {
   productId: number;
   productName: string;
   name: string;
-  price: number;
+  costPrice: number;
+  salePrice: number;
   imageUrl: string | null;
   imagePath: string | null;
   active: boolean;
@@ -12,7 +13,8 @@ export interface ProductPresentation {
 export interface PresentationFormPayload {
   productId: number;
   name: string;
-  price: number;
+  costPrice: number;
+  salePrice: number;
   active: boolean;
   imageFile: File | null;
   removeImage: boolean;

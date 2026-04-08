@@ -182,7 +182,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"product_id\": 1,\n  \"name\": \"Isopor 1/4 kg\",\n  \"price\": 15000,\n  \"image_url\": null,\n  \"image_path\": null\n}",
+              "raw": "{\n  \"product_id\": 1,\n  \"name\": \"Isopor 1/4 kg\",\n  \"cost_price\": 9000,\n  \"sale_price\": 15000,\n  \"image_url\": null,\n  \"image_path\": null\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{base_url}}/api/presentations", "host": ["{{base_url}}"], "path": ["api", "presentations"] }
@@ -195,7 +195,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Isopor 1/4 kg\",\n  \"price\": 18000,\n  \"image_url\": \"https://cdn.example.com/img/isopor-1-4.jpg\",\n  \"image_path\": \"/uploads/presentations/isopor-1-4.jpg\"\n}",
+              "raw": "{\n  \"name\": \"Isopor 1/4 kg\",\n  \"cost_price\": 11000,\n  \"sale_price\": 18000,\n  \"image_url\": \"https://cdn.example.com/img/isopor-1-4.jpg\",\n  \"image_path\": \"/uploads/presentations/isopor-1-4.jpg\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{base_url}}/api/presentations/1", "host": ["{{base_url}}"], "path": ["api", "presentations", "1"] }

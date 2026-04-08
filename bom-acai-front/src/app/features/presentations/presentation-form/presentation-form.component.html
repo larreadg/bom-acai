@@ -77,21 +77,40 @@
               }
             </div>
 
-            <div class="field">
-              <label for="price">Precio</label>
-              <p-inputnumber
-                inputId="price"
-                formControlName="price"
-                placeholder="Ej. 15000"
-                [min]="0"
-                [useGrouping]="true"
-                styleClass="w-full"
-                inputStyleClass="w-full"
-                [invalid]="isFieldInvalid('price')"
-              />
-              @if (isFieldInvalid('price')) {
-                <small class="field-error">El precio es obligatorio y debe ser mayor o igual a 0.</small>
-              }
+            <div class="price-fields">
+              <div class="field">
+                <label for="costPrice">Precio de costo</label>
+                <p-inputnumber
+                  inputId="costPrice"
+                  formControlName="costPrice"
+                  placeholder="Ej. 9000"
+                  [min]="0"
+                  [useGrouping]="true"
+                  styleClass="w-full"
+                  inputStyleClass="w-full"
+                  [invalid]="isFieldInvalid('costPrice')"
+                />
+                @if (isFieldInvalid('costPrice')) {
+                  <small class="field-error">El precio de costo es obligatorio y debe ser mayor o igual a 0.</small>
+                }
+              </div>
+
+              <div class="field">
+                <label for="salePrice">Precio de venta</label>
+                <p-inputnumber
+                  inputId="salePrice"
+                  formControlName="salePrice"
+                  placeholder="Ej. 15000"
+                  [min]="0"
+                  [useGrouping]="true"
+                  styleClass="w-full"
+                  inputStyleClass="w-full"
+                  [invalid]="isFieldInvalid('salePrice')"
+                />
+                @if (isFieldInvalid('salePrice')) {
+                  <small class="field-error">El precio de venta es obligatorio y debe ser mayor o igual a 0.</small>
+                }
+              </div>
             </div>
 
             <!-- Image upload -->
@@ -195,8 +214,13 @@
           </div>
 
           <div class="summary-row">
-            <span>Precio</span>
-            <strong class="price-preview">{{ previewPrice | number:'1.0-0' }}</strong>
+            <span>Costo</span>
+            <strong class="price-preview">{{ previewCostPrice | number:'1.0-0' }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Venta</span>
+            <strong class="price-preview">{{ previewSalePrice | number:'1.0-0' }}</strong>
           </div>
 
           @if (summaryImageUrl) {

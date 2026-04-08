@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { Order, OrderCreatePayload } from '../models/order.model';
+import { Order, OrderCreatePayload, OrderListResult } from '../models/order.model';
+
+export interface OrderFilters {
+  dateFrom?: string;
+  dateTo?: string;
+  status?: string;
+}
 
 interface OrderExtraApi {
   id: number | string;
@@ -22,6 +28,7 @@ interface OrderItemApi {
   product_name: string;
   presentation_name: string;
   quantity: number | string;
+  unit_cost: number | string;
   unit_price: number | string;
   subtotal: number | string;
   notes: string | null;
@@ -43,6 +50,36 @@ export class OrderService {
   private readonly baseUrl = `${environment.apiUrl}/api/orders`;
 
   constructor(private http: HttpClient) {}
+
+  list(filters: OrderFilters = {}): Observable<OrderListResult> {
+    let params = new HttpParams();
+    if (filters.dateFrom) params = params.set('date_from', filters.dateFrom);
+    if (filters.dateTo)   params = params.set('date_to',   filters.dateTo);
+    if (filters.status)   params = params.set('status',    filters.status);
+
+    return this.http
+      .get<ApiResponse<{ summary: { total_orders: number; total_amount: number; total_cost: number; total_profit: number; cancelled_orders: number }; orders: OrderApi[] }>>(
+        this.baseUrl, { params }
+      )
+      .pipe(
+        map(res => ({
+          summary: {
+            totalOrders:     res.data.summary.total_orders,
+            totalAmount:     res.data.summary.total_amount,
+            totalCost:       res.data.summary.total_cost,
+            totalProfit:     res.data.summary.total_profit,
+            cancelledOrders: res.data.summary.cancelled_orders,
+          },
+          orders: res.data.orders.map(o => this.toModel(o)),
+        }))
+      );
+  }
+
+  cancel(id: number): Observable<Order> {
+    return this.http
+      .patch<ApiResponse<OrderApi>>(`${this.baseUrl}/${id}/cancel`, {})
+      .pipe(map(res => this.toModel(res.data)));
+  }
 
   create(payload: OrderCreatePayload): Observable<Order> {
     return this.http
@@ -66,6 +103,7 @@ export class OrderService {
         productName: item.product_name,
         presentationName: item.presentation_name,
         quantity: Number(item.quantity),
+        unitCost: Number(item.unit_cost),
         unitPrice: Number(item.unit_price),
         subtotal: Number(item.subtotal),
         notes: item.notes,

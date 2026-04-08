@@ -58,6 +58,13 @@ export class HomeComponent {
       note: 'Toppings \u00b7 Agregados \u00b7 Precios',
     },
     {
+      title: 'Historial',
+      icon: 'pi pi-history',
+      route: '/historial',
+      available: true,
+      note: 'Pedidos \u00b7 Ventas \u00b7 Cancelar',
+    },
+    {
       title: 'Configuraci\u00f3n',
       icon: 'pi pi-sliders-h',
       route: '/configuracion',

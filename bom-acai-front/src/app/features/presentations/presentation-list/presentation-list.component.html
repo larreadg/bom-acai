@@ -119,7 +119,7 @@
             <tr>
               <th>Presentaci&oacute;n</th>
               <th>Producto</th>
-              <th>Precio</th>
+              <th>Precios</th>
               <th>Imagen</th>
               <th>Estado</th>
               <th class="actions-column">Acciones</th>
@@ -133,7 +133,12 @@
               <td><span class="product-pill">{{ p.productName }}</span></td>
 
               <td>
-                <span class="price-cell">{{ p.price | number:'1.0-0' }}</span>
+                <div class="price-stack">
+                  <span class="price-meta">Costo</span>
+                  <span class="price-cell">{{ p.costPrice | number:'1.0-0' }}</span>
+                  <span class="price-meta">Venta</span>
+                  <span class="price-cell price-cell--sale">{{ p.salePrice | number:'1.0-0' }}</span>
+                </div>
               </td>
 
               <td>
