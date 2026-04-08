@@ -21,7 +21,7 @@ class QzTray
 
     private static function certsDir(): string
     {
-        return dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'qztray-certs';
+        return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'qztray-certs';
     }
 
     private static function resolvePath(string $envVar, array $fallbacks): string

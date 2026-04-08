@@ -41,7 +41,7 @@ class QzSecurityService
 
         $signature = '';
         $signed = openssl_sign($payload, $signature, $privateKey, OPENSSL_ALGO_SHA512);
-        openssl_free_key($privateKey);
+        unset($privateKey);
 
         if ($signed !== true) {
             throw new RuntimeException('No se pudo firmar el payload de QZ Tray');
