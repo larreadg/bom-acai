@@ -77,8 +77,8 @@ class OrderService
             );
 
             $extraStmt = $this->db->prepare(
-                'INSERT INTO "order_item_extras" ("order_item_id", "extra_id", "unit_price")
-                 VALUES (?, ?, ?)'
+                'INSERT INTO "order_item_extras" ("order_item_id", "extra_id", "unit_cost", "unit_price")
+                 VALUES (?, ?, ?, ?)'
             );
 
             foreach ($data['items'] as $item) {
@@ -109,6 +109,7 @@ class OrderService
                     $extraStmt->execute([
                         $orderItemId,
                         $extra['extra_id'],
+                        $extra['unit_cost'],
                         $extra['unit_price'],
                     ]);
                 }
@@ -197,7 +198,7 @@ class OrderService
                 $itemPlaceholders = implode(', ', array_fill(0, count($itemIds), '?'));
 
                 $extrasStmt = $this->db->prepare(
-                    "SELECT oie.*, e.\"name\" AS \"extra_name\"
+                    "SELECT oie.*, e.\"name\" AS \"extra_name\", e.\"cost_price\" AS \"current_cost_price\"
                       FROM \"order_item_extras\" oie
                       JOIN \"extras\" e ON e.\"id\" = oie.\"extra_id\"
                       WHERE oie.\"order_item_id\" IN ({$itemPlaceholders})
@@ -206,6 +207,9 @@ class OrderService
                 $extrasStmt->execute($itemIds);
 
                 foreach ($extrasStmt->fetchAll() as $extra) {
+                    $extra['unit_cost'] = (float) $extra['unit_cost'] > 0
+                        ? (float) $extra['unit_cost']
+                        : (float) $extra['current_cost_price'];
                     $extrasByItem[(int) $extra['order_item_id']][] = $extra;
                 }
             }
@@ -213,6 +217,9 @@ class OrderService
             $itemsByOrder = [];
 
             foreach ($allItems as $item) {
+                $item['unit_cost'] = (float) $item['unit_cost'] > 0
+                    ? (float) $item['unit_cost']
+                    : (float) $item['current_cost_price'];
                 $item['extras']                           = $extrasByItem[(int) $item['id']] ?? [];
                 $itemsByOrder[(int) $item['order_id']][] = $item;
             }
@@ -228,12 +235,12 @@ class OrderService
         foreach ($orders as $order) {
             if ($order['status'] !== 'cancelled') {
                 foreach ($order['items'] as $item) {
-                    // unit_cost = 0 for orders created before cost tracking was added;
-                    // fall back to the presentation's current cost_price.
-                    $unitCost   = (float) $item['unit_cost'] > 0
-                        ? (float) $item['unit_cost']
-                        : (float) $item['current_cost_price'];
-                    $totalCost += $unitCost * (int) $item['quantity'];
+                    $quantity = (int) $item['quantity'];
+                    $totalCost += (float) $item['unit_cost'] * $quantity;
+
+                    foreach ($item['extras'] as $extra) {
+                        $totalCost += (float) $extra['unit_cost'] * $quantity;
+                    }
                 }
             }
         }
@@ -280,6 +287,7 @@ class OrderService
                 oi.*,
                 pp."name" AS "presentation_name",
                 pp."product_id",
+                pp."cost_price" AS "current_cost_price",
                 p."name" AS "product_name"
              FROM "order_items" oi
              JOIN "product_presentations" pp ON pp."id" = oi."product_presentation_id"
@@ -293,7 +301,8 @@ class OrderService
         $extrasStmt = $this->db->prepare(
             'SELECT
                 oie.*,
-                e."name" AS "extra_name"
+                e."name" AS "extra_name",
+                e."cost_price" AS "current_cost_price"
              FROM "order_item_extras" oie
              JOIN "order_items" oi ON oi."id" = oie."order_item_id"
              JOIN "extras" e ON e."id" = oie."extra_id"
@@ -306,10 +315,16 @@ class OrderService
 
         foreach ($extrasStmt->fetchAll() as $extra) {
             $orderItemId = (int) $extra['order_item_id'];
+            $extra['unit_cost'] = (float) $extra['unit_cost'] > 0
+                ? (float) $extra['unit_cost']
+                : (float) $extra['current_cost_price'];
             $extrasByItem[$orderItemId][] = $extra;
         }
 
         foreach ($items as &$item) {
+            $item['unit_cost'] = (float) $item['unit_cost'] > 0
+                ? (float) $item['unit_cost']
+                : (float) $item['current_cost_price'];
             $item['extras'] = $extrasByItem[(int) $item['id']] ?? [];
         }
         unset($item);

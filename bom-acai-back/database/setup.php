@@ -31,36 +31,34 @@ function hasColumn(PDO $pdo, string $table, string $column): bool
 $pdo->exec(file_get_contents($schema));
 echo "Schema applied.\n";
 
-$addedCostPrice = false;
-$addedSalePrice = false;
-
 if (!hasColumn($pdo, 'product_presentations', 'cost_price')) {
     $pdo->exec('ALTER TABLE "product_presentations" ADD COLUMN "cost_price" REAL NOT NULL DEFAULT 0');
-    $addedCostPrice = true;
     echo "Column product_presentations.cost_price added.\n";
 }
 
 if (!hasColumn($pdo, 'product_presentations', 'sale_price')) {
     $pdo->exec('ALTER TABLE "product_presentations" ADD COLUMN "sale_price" REAL NOT NULL DEFAULT 0');
-    $addedSalePrice = true;
     echo "Column product_presentations.sale_price added.\n";
-}
-
-if (($addedCostPrice || $addedSalePrice) && hasColumn($pdo, 'product_presentations', 'price')) {
-    if ($addedCostPrice) {
-        $pdo->exec('UPDATE "product_presentations" SET "cost_price" = "price"');
-    }
-
-    if ($addedSalePrice) {
-        $pdo->exec('UPDATE "product_presentations" SET "sale_price" = "price"');
-    }
-
-    echo "Existing presentation prices migrated to cost_price/sale_price.\n";
 }
 
 if (!hasColumn($pdo, 'order_items', 'unit_cost')) {
     $pdo->exec('ALTER TABLE "order_items" ADD COLUMN "unit_cost" REAL NOT NULL DEFAULT 0');
     echo "Column order_items.unit_cost added.\n";
+}
+
+if (!hasColumn($pdo, 'extras', 'cost_price')) {
+    $pdo->exec('ALTER TABLE "extras" ADD COLUMN "cost_price" REAL NOT NULL DEFAULT 0');
+    echo "Column extras.cost_price added.\n";
+}
+
+if (!hasColumn($pdo, 'extras', 'sale_price')) {
+    $pdo->exec('ALTER TABLE "extras" ADD COLUMN "sale_price" REAL NOT NULL DEFAULT 0');
+    echo "Column extras.sale_price added.\n";
+}
+
+if (!hasColumn($pdo, 'order_item_extras', 'unit_cost')) {
+    $pdo->exec('ALTER TABLE "order_item_extras" ADD COLUMN "unit_cost" REAL NOT NULL DEFAULT 0');
+    echo "Column order_item_extras.unit_cost added.\n";
 }
 
 // Seed default user (INSERT OR IGNORE — safe to run multiple times)

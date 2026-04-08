@@ -17,6 +17,7 @@ interface OrderExtraApi {
   order_item_id: number | string;
   extra_id: number | string;
   extra_name: string;
+  unit_cost: number | string;
   unit_price: number | string;
 }
 
@@ -112,6 +113,7 @@ export class OrderService {
           orderItemId: Number(extra.order_item_id),
           extraId: Number(extra.extra_id),
           extraName: extra.extra_name,
+          unitCost: Number(extra.unit_cost),
           unitPrice: Number(extra.unit_price),
         })),
       })),

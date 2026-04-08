@@ -30,9 +30,10 @@ class ExtraController
 
     public function store(): void
     {
-        $body  = Flight::request()->data->getData();
-        $name  = trim($body['name']  ?? '');
-        $price = $body['price']      ?? null;
+        $body      = Flight::request()->data->getData();
+        $name      = trim($body['name'] ?? '');
+        $costPrice = $body['cost_price'] ?? null;
+        $salePrice = $body['sale_price'] ?? null;
 
         if ($name === '') {
             ApiResponse::error('name is required', 400)->send();
@@ -44,8 +45,13 @@ class ExtraController
             return;
         }
 
-        if ($price === null || !is_numeric($price) || (float) $price < 0) {
-            ApiResponse::error('price must be a number >= 0', 400)->send();
+        if ($costPrice === null || !is_numeric($costPrice) || (float) $costPrice < 0) {
+            ApiResponse::error('cost_price must be a number >= 0', 400)->send();
+            return;
+        }
+
+        if ($salePrice === null || !is_numeric($salePrice) || (float) $salePrice < 0) {
+            ApiResponse::error('sale_price must be a number >= 0', 400)->send();
             return;
         }
 
@@ -54,8 +60,9 @@ class ExtraController
             return;
         }
 
-        $body['name']  = $name;
-        $body['price'] = (float) $price;
+        $body['name']       = $name;
+        $body['cost_price'] = (float) $costPrice;
+        $body['sale_price'] = (float) $salePrice;
 
         $id = $this->service->create($body);
 
@@ -97,15 +104,26 @@ class ExtraController
             $body['name'] = $name;
         }
 
-        if (array_key_exists('price', $body)) {
-            $price = $body['price'];
+        if (array_key_exists('cost_price', $body)) {
+            $costPrice = $body['cost_price'];
 
-            if (!is_numeric($price) || (float) $price < 0) {
-                ApiResponse::error('price must be a number >= 0', 400)->send();
+            if (!is_numeric($costPrice) || (float) $costPrice < 0) {
+                ApiResponse::error('cost_price must be a number >= 0', 400)->send();
                 return;
             }
 
-            $body['price'] = (float) $price;
+            $body['cost_price'] = (float) $costPrice;
+        }
+
+        if (array_key_exists('sale_price', $body)) {
+            $salePrice = $body['sale_price'];
+
+            if (!is_numeric($salePrice) || (float) $salePrice < 0) {
+                ApiResponse::error('sale_price must be a number >= 0', 400)->send();
+                return;
+            }
+
+            $body['sale_price'] = (float) $salePrice;
         }
 
         $ok = $this->service->update($id, $body);

@@ -15,6 +15,7 @@ export interface OrderItemExtra {
   orderItemId: number;
   extraId: number;
   extraName: string;
+  unitCost: number;
   unitPrice: number;
 }
 

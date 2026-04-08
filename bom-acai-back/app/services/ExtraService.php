@@ -44,12 +44,13 @@ class ExtraService
     public function create(array $data): int|false
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO "extras" ("name", "price", "active") VALUES (?, ?, ?)'
+            'INSERT INTO "extras" ("name", "cost_price", "sale_price", "active") VALUES (?, ?, ?, ?)'
         );
 
         $ok = $stmt->execute([
             $data['name'],
-            $data['price'],
+            $data['cost_price'],
+            $data['sale_price'],
             $data['active'] ?? 1,
         ]);
 
@@ -61,9 +62,10 @@ class ExtraService
         $fields = [];
         $values = [];
 
-        if (isset($data['name']))   { $fields[] = '"name" = ?';   $values[] = $data['name']; }
-        if (isset($data['price']))  { $fields[] = '"price" = ?';  $values[] = $data['price']; }
-        if (isset($data['active'])) { $fields[] = '"active" = ?'; $values[] = $data['active']; }
+        if (isset($data['name']))       { $fields[] = '"name" = ?';        $values[] = $data['name']; }
+        if (isset($data['cost_price'])) { $fields[] = '"cost_price" = ?';  $values[] = $data['cost_price']; }
+        if (isset($data['sale_price'])) { $fields[] = '"sale_price" = ?';  $values[] = $data['sale_price']; }
+        if (isset($data['active']))     { $fields[] = '"active" = ?';      $values[] = $data['active']; }
 
         if (empty($fields)) {
             return false;

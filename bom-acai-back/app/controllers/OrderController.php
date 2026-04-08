@@ -112,8 +112,9 @@ class OrderController
             foreach ($extraIds as $extraId) {
                 $extra = $extras[$extraId];
                 $normalizedExtras[] = [
+                    'unit_cost'  => (float) $extra['cost_price'],
                     'extra_id'   => (int) $extra['id'],
-                    'unit_price' => (float) $extra['price'],
+                    'unit_price' => (float) $extra['sale_price'],
                 ];
             }
 

@@ -83,7 +83,8 @@ CREATE INDEX IF NOT EXISTS "idx_product_presentations_product_id"
 CREATE TABLE IF NOT EXISTS "extras" (
     "id"         INTEGER PRIMARY KEY AUTOINCREMENT,
     "name"       TEXT NOT NULL UNIQUE,       -- "Leche en polvo", "Chocolate", "Kiwi", etc.
-    "price"      REAL NOT NULL,
+    "cost_price" REAL NOT NULL DEFAULT 0,
+    "sale_price" REAL NOT NULL,
     "active"     INTEGER NOT NULL DEFAULT 1,
     "created_at" DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -119,6 +120,7 @@ CREATE TABLE IF NOT EXISTS "order_item_extras" (
     "id"             INTEGER PRIMARY KEY AUTOINCREMENT,
     "order_item_id"  INTEGER NOT NULL,
     "extra_id"       INTEGER NOT NULL,
+    "unit_cost"      REAL    NOT NULL DEFAULT 0, -- costo al momento del pedido
     "unit_price"     REAL    NOT NULL,            -- precio al momento del pedido
     FOREIGN KEY ("order_item_id") REFERENCES "order_items"("id") ON DELETE CASCADE,
     FOREIGN KEY ("extra_id")      REFERENCES "extras"("id")

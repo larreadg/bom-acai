@@ -82,7 +82,7 @@
           <ng-template pTemplate="header">
             <tr>
               <th>Extra</th>
-              <th>Precio</th>
+              <th>Precios</th>
               <th>Estado</th>
               <th class="actions-column">Acciones</th>
             </tr>
@@ -91,7 +91,14 @@
           <ng-template pTemplate="body" let-e>
             <tr>
               <td><strong>{{ e.name }}</strong></td>
-              <td><span class="price-cell">{{ e.price | number:'1.0-0' }}</span></td>
+              <td>
+                <div class="price-stack">
+                  <span class="price-meta">Costo</span>
+                  <span class="price-cell">{{ e.costPrice | number:'1.0-0' }}</span>
+                  <span class="price-meta">Venta</span>
+                  <span class="price-cell price-cell--sale">{{ e.salePrice | number:'1.0-0' }}</span>
+                </div>
+              </td>
               <td>
                 <p-tag [value]="e.active ? 'Activo' : 'Inactivo'" [severity]="e.active ? 'success' : 'secondary'"></p-tag>
               </td>

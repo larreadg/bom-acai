@@ -19,6 +19,7 @@ import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 import { OrderTicketComponent } from '../../../shared/order-ticket/order-ticket.component';
 import { PresentationService } from '../../../core/services/presentation.service';
 import { Order } from '../../../core/models/order.model';
+import { environment } from '../../../../environments/environment';
 
 interface CartItem {
   key: string;
@@ -38,6 +39,8 @@ interface CartItem {
   styleUrl: './order-create.component.scss',
 })
 export class OrderCreateComponent implements OnInit {
+  readonly apiUrl = environment.apiUrl;
+
   presentations: ProductPresentation[] = [];
   extras: Extra[] = [];
   cart: CartItem[] = [];
@@ -111,7 +114,7 @@ export class OrderCreateComponent implements OnInit {
   }
 
   get selectedExtrasTotal(): number {
-    return this.selectedExtras.reduce((total, extra) => total + extra.price, 0);
+    return this.selectedExtras.reduce((total, extra) => total + extra.salePrice, 0);
   }
 
   get cartItemsCount(): number {
@@ -147,7 +150,7 @@ export class OrderCreateComponent implements OnInit {
 
           this.extras = extras
             .filter(item => item.active)
-            .sort((a, b) => a.price - b.price || a.name.localeCompare(b.name));
+            .sort((a, b) => a.salePrice - b.salePrice || a.name.localeCompare(b.name));
 
           if (this.presentations.length > 0) {
             this.selectedPresentationId = this.presentations[0].id;
@@ -326,7 +329,7 @@ export class OrderCreateComponent implements OnInit {
   }
 
   getCartItemUnitTotal(item: CartItem): number {
-    const extrasTotal = item.extras.reduce((total, extra) => total + extra.price, 0);
+    const extrasTotal = item.extras.reduce((total, extra) => total + extra.salePrice, 0);
     return item.unitPrice + extrasTotal;
   }
 

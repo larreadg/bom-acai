@@ -20,7 +20,10 @@ export class ReportService {
   ): Promise<void> {
     // Pre-compute per-order cost/profit
     for (const order of orders) {
-      (order as any)._cost   = order.items.reduce((s, i) => s + i.unitCost * i.quantity, 0);
+      (order as any)._cost = order.items.reduce(
+        (sum, item) => sum + this.getItemCost(item),
+        0
+      );
       (order as any)._profit = order.status !== 'cancelled' ? order.total - (order as any)._cost : 0;
     }
 
@@ -295,6 +298,11 @@ export class ReportService {
 
   private formatOrderId(id: number): string {
     return String(id).padStart(7, '0');
+  }
+
+  private getItemCost(item: Order['items'][number]): number {
+    const extrasCost = item.extras.reduce((sum, extra) => sum + extra.unitCost, 0);
+    return (item.unitCost + extrasCost) * item.quantity;
   }
 
   private formatPrice(value: number): string {

@@ -234,7 +234,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Leche en polvo\",\n  \"price\": 2000\n}",
+              "raw": "{\n  \"name\": \"Leche en polvo\",\n  \"cost_price\": 900,\n  \"sale_price\": 2000\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{base_url}}/api/extras", "host": ["{{base_url}}"], "path": ["api", "extras"] }
@@ -247,7 +247,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Leche en polvo\",\n  \"price\": 2500,\n  \"active\": 1\n}",
+              "raw": "{\n  \"name\": \"Leche en polvo\",\n  \"cost_price\": 1100,\n  \"sale_price\": 2500,\n  \"active\": 1\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{base_url}}/api/extras/1", "host": ["{{base_url}}"], "path": ["api", "extras", "1"] }

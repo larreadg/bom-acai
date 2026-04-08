@@ -1,12 +1,14 @@
 export interface Extra {
   id: number;
   name: string;
-  price: number;
+  costPrice: number;
+  salePrice: number;
   active: boolean;
 }
 
 export interface ExtraFormPayload {
   name: string;
-  price: number;
+  costPrice: number;
+  salePrice: number;
   active: boolean;
 }

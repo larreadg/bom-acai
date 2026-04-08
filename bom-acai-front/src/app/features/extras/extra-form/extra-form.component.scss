@@ -25,6 +25,7 @@
 .form-card form, .field, .summary-card { display: flex; flex-direction: column; }
 .form-card form, .summary-card { gap: 1rem; }
 .field { gap: .45rem; }
+.price-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .field label, .summary-row span, .summary-status span { font-size: .95rem; font-weight: 600; color: #344054; }
 .field-error { color: #c2410c; font-size: .85rem; }
 .toggle-row { display: grid; grid-template-columns: auto 1fr; gap: .85rem; align-items: start; padding: 1rem 1.05rem; border-radius: 18px; background: #faf7ff; border: 1px solid #ede9fe; }
@@ -39,6 +40,7 @@
 @media (max-width: 960px) {
   .topbar, .page-content { padding-left: 1rem; padding-right: 1rem; }
   .editor-grid { grid-template-columns: 1fr; }
+  .price-fields { grid-template-columns: 1fr; }
 }
 @media (max-width: 720px) {
   .topbar { flex-direction: column; align-items: stretch; }

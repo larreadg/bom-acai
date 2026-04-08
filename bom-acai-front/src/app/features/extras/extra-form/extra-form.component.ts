@@ -19,9 +19,10 @@ import { ExtraService } from '../../../core/services/extra.service';
 import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 
 interface ExtraFormValue {
-  name:   string;
-  price:  number | null;
-  active: boolean;
+  name:      string;
+  costPrice: number | null;
+  salePrice: number | null;
+  active:    boolean;
 }
 
 @Component({
@@ -61,9 +62,10 @@ export class ExtraFormComponent implements OnInit {
     private cdr:            ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
-      name:   ['',   [Validators.required, Validators.maxLength(80)]],
-      price:  [null, [Validators.required, Validators.min(0)]],
-      active: [true],
+      name:      ['',   [Validators.required, Validators.maxLength(80)]],
+      costPrice: [null, [Validators.required, Validators.min(0)]],
+      salePrice: [null, [Validators.required, Validators.min(0)]],
+      active:    [true],
     });
   }
 
@@ -94,9 +96,10 @@ export class ExtraFormComponent implements OnInit {
   }
   get submitLabel(): string { return this.isEditMode ? 'Guardar cambios' : 'Crear extra'; }
 
-  get previewName():   string  { return this.form.get('name')?.value?.trim() || 'Nuevo extra'; }
-  get previewPrice():  number  { return this.form.get('price')?.value        ?? 0; }
-  get previewActive(): boolean { return !!this.form.get('active')?.value; }
+  get previewName():      string  { return this.form.get('name')?.value?.trim() || 'Nuevo extra'; }
+  get previewCostPrice(): number  { return this.form.get('costPrice')?.value ?? 0; }
+  get previewSalePrice(): number  { return this.form.get('salePrice')?.value ?? 0; }
+  get previewActive():    boolean { return !!this.form.get('active')?.value; }
 
   isFieldInvalid(name: string): boolean {
     const c = this.form.get(name);
@@ -151,7 +154,12 @@ export class ExtraFormComponent implements OnInit {
     ).subscribe({
       next: (extra: Extra) => {
         this.syncView(() => {
-          this.form.reset({ name: extra.name, price: extra.price, active: extra.active });
+          this.form.reset({
+            name: extra.name,
+            costPrice: extra.costPrice,
+            salePrice: extra.salePrice,
+            active: extra.active,
+          });
           this.initialValue = this.buildPayload();
           this.pageReady    = true;
         });
@@ -167,11 +175,21 @@ export class ExtraFormComponent implements OnInit {
 
   private buildPayload(): ExtraFormPayload {
     const v = this.form.getRawValue() as ExtraFormValue;
-    return { name: v.name.trim(), price: Number(v.price), active: !!v.active };
+    return {
+      name: v.name.trim(),
+      costPrice: Number(v.costPrice),
+      salePrice: Number(v.salePrice),
+      active: !!v.active,
+    };
   }
 
   private isSame(a: ExtraFormPayload, b: ExtraFormPayload): boolean {
-    return a.name === b.name && a.price === b.price && a.active === b.active;
+    return (
+      a.name === b.name &&
+      a.costPrice === b.costPrice &&
+      a.salePrice === b.salePrice &&
+      a.active === b.active
+    );
   }
 
   private errMsg(err: HttpErrorResponse): string {

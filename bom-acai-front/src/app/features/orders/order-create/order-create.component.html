@@ -160,10 +160,18 @@
               [class.pres-card--selected]="p.id === selectedPresentationId"
               (click)="selectPresentation(p.id)"
             >
+              <div class="pres-image" [class.pres-image--placeholder]="!p.imagePath">
+                @if (p.imagePath) {
+                  <img [src]="apiUrl + '/' + p.imagePath" [alt]="p.name" loading="lazy" />
+                } @else {
+                  <div class="pres-image__empty" aria-hidden="true">
+                    <i class="pi pi-image"></i>
+                  </div>
+                }
+              </div>
               <span class="pres-tag">{{ p.productName }}</span>
               <span class="pres-name">{{ p.name }}</span>
               <strong class="pres-price">{{ formatPrice(p.salePrice) }}</strong>
-              <span class="pres-cost">Costo: {{ formatPrice(p.costPrice) }}</span>
             </button>
           }
         </div>
@@ -188,7 +196,7 @@
                 >
                   <span class="extra-chip__mark">{{ selectedExtraIds.includes(e.id) ? '✓' : '+' }}</span>
                   <span>{{ e.name }}</span>
-                  <span class="extra-chip__price">{{ formatPrice(e.price) }}</span>
+                  <span class="extra-chip__price">{{ formatPrice(e.salePrice) }}</span>
                 </button>
               }
             </div>

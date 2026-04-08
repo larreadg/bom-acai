@@ -122,12 +122,11 @@ export class OrderListComponent implements OnInit {
     this.orderService.cancel(id).pipe(
       finalize(() => this.syncView(() => { this.cancelling = false; }))
     ).subscribe({
-      next: updated => {
+      next: () => {
         this.syncView(() => {
-          this.orders = this.orders.map(o => o.id === id ? updated : o);
-          this.summary.cancelledOrders++;
           this.cancelTarget = null;
         });
+        this.load();
         this.messageService.add({ severity: 'success', summary: 'Pedido cancelado', detail: `Pedido #${this.formatOrderId(id)} cancelado.` });
       },
       error: (err: HttpErrorResponse) => {

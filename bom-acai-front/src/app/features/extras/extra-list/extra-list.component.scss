@@ -43,7 +43,10 @@
 :host ::ng-deep .p-datatable .p-datatable-thead > tr > th { background: #faf7ff; color: #5b21b6; border-color: #ede9fe; font-size: .87rem; }
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td { border-color: #f1ebff; vertical-align: middle; }
 :host ::ng-deep .p-datatable .p-paginator { border: 0; padding-top: 1rem; background: transparent; }
+.price-stack { display: grid; grid-template-columns: auto 1fr; gap: .1rem .6rem; align-items: baseline; }
+.price-meta { font-size: .72rem; font-weight: 700; color: #8b5cf6; text-transform: uppercase; letter-spacing: .04em; }
 .price-cell { font-variant-numeric: tabular-nums; font-weight: 600; color: #5b21b6; }
+.price-cell--sale { color: #166534; }
 .actions-column { width: 1%; white-space: nowrap; }
 .row-actions { justify-content: flex-end; }
 @media (max-width: 960px) {

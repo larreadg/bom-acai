@@ -9,7 +9,8 @@ import { Extra, ExtraFormPayload } from '../models/extra.model';
 interface ExtraApi {
   id: number | string;
   name: string;
-  price: number | string;
+  cost_price: number | string;
+  sale_price: number | string;
   active: number | string | boolean;
 }
 
@@ -51,18 +52,20 @@ export class ExtraService {
 
   private toModel(e: ExtraApi): Extra {
     return {
-      id:     Number(e.id),
-      name:   e.name,
-      price:  Number(e.price),
-      active: typeof e.active === 'boolean' ? e.active : Number(e.active) === 1,
+      id:        Number(e.id),
+      name:      e.name,
+      costPrice: Number(e.cost_price),
+      salePrice: Number(e.sale_price),
+      active:    typeof e.active === 'boolean' ? e.active : Number(e.active) === 1,
     };
   }
 
   private toRequest(payload: Partial<ExtraFormPayload>): Record<string, unknown> {
     const req: Record<string, unknown> = {};
-    if (payload.name   !== undefined) req['name']   = payload.name.trim();
-    if (payload.price  !== undefined) req['price']  = payload.price;
-    if (payload.active !== undefined) req['active'] = payload.active ? 1 : 0;
+    if (payload.name      !== undefined) req['name'] = payload.name.trim();
+    if (payload.costPrice !== undefined) req['cost_price'] = payload.costPrice;
+    if (payload.salePrice !== undefined) req['sale_price'] = payload.salePrice;
+    if (payload.active    !== undefined) req['active'] = payload.active ? 1 : 0;
     return req;
   }
 }
