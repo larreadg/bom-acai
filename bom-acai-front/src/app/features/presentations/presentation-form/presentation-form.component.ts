@@ -17,9 +17,9 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 
 import { Product, PresentationFormPayload, ProductPresentation } from '../../../core/models/product.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { ProductService } from '../../../core/services/product.service';
 import { PresentationService } from '../../../core/services/presentation.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 import { environment } from '../../../../environments/environment';
 
 interface PresentationFormValue {
@@ -44,6 +44,7 @@ interface PresentationFormValue {
     ProgressSpinnerModule,
     SelectModule,
     TagModule,
+    TopbarComponent,
   ],
   templateUrl: './presentation-form.component.html',
   styleUrl: './presentation-form.component.scss',
@@ -73,7 +74,6 @@ export class PresentationFormComponent implements OnInit, OnDestroy {
     private presentationService: PresentationService,
     private messageService:      MessageService,
     private cdr:                 ChangeDetectorRef,
-    public  auth:                AuthService,
   ) {
     this.form = this.fb.group({
       productId: [null, Validators.required],

@@ -1,0 +1,299 @@
+<!-- ── Modal de confirmación ─────────────────────────────── -->
+<p-dialog
+  [(visible)]="confirmVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  header="Confirmar pedido"
+  styleClass="confirm-dialog"
+  [style]="{ width: '460px', maxWidth: '95vw' }"
+>
+  <div class="confirm-body">
+    <!-- Resumen de items -->
+    <div class="confirm-items">
+      @for (item of cart; track item.key) {
+        <div class="confirm-item">
+          <div class="confirm-item__row">
+            <span class="confirm-item__qty">x{{ item.quantity }}</span>
+            <span class="confirm-item__name">{{ item.presentationName }}</span>
+            <span class="confirm-item__price">{{ formatPrice(getCartItemTotal(item)) }}</span>
+          </div>
+          <div class="confirm-item__product">{{ item.productName }}</div>
+          @if (item.extras.length > 0) {
+            <div class="confirm-item__extras">
+              @for (e of item.extras; track e.id) {
+                <span class="confirm-extra-tag">+ {{ e.name }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Total -->
+    <div class="confirm-total">
+      <span>Total</span>
+      <strong>{{ formatPrice(cartTotal) }}</strong>
+    </div>
+
+    <!-- Nota (opcional) -->
+    <div class="confirm-notes">
+      <label>Nota del pedido <span class="confirm-notes__hint">(opcional)</span></label>
+      <textarea
+        class="confirm-notes__input"
+        rows="2"
+        placeholder="Ej: sin sal, para llevar..."
+        [(ngModel)]="orderNotes"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancelar" severity="secondary" [text]="true" (click)="confirmVisible = false"></button>
+    <button pButton type="button" label="Confirmar pedido" icon="pi pi-check" [loading]="submitting" (click)="doSubmitOrder()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Modal de ticket ───────────────────────────────────── -->
+<p-dialog
+  [(visible)]="ticketVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  header="Pedido generado"
+  styleClass="ticket-dialog"
+  [style]="{ width: 'auto' }"
+  (onHide)="closeTicket()"
+>
+  @if (createdOrder) {
+    <div #ticketRef class="thermal-ticket">
+      <app-order-ticket [order]="createdOrder"></app-order-ticket>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    @if (hasPrinter) {
+      <button pButton type="button" icon="pi pi-print" label="Imprimir" [loading]="printing" (click)="printTicket()"></button>
+    } @else {
+      <button pButton type="button" icon="pi pi-download" label="Descargar" [loading]="printing" (click)="printTicket()"></button>
+    }
+  </ng-template>
+</p-dialog>
+
+@if (loading) {
+  <div class="loading-screen">
+    <p-progress-spinner ariaLabel="Cargando cat&aacute;logo" />
+    <p>Cargando cat&aacute;logo...</p>
+  </div>
+} @else {
+  <div class="pos-screen">
+
+    <!-- ── Topbar ─────────────────────────────────────────── -->
+    <app-topbar
+      subtitle="Sistema de Pedidos"
+      backRoute="/"
+      backLabel="Inicio"
+      backIcon="pi pi-home"
+    ></app-topbar>
+
+    <!-- ── Main body ──────────────────────────────────────── -->
+    <div class="pos-body">
+
+      <!-- ── Left: Catalog ──────────────────────────────── -->
+      <section class="catalog">
+
+        @if (error) {
+          <div class="error-banner">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ error }}</span>
+          </div>
+        }
+
+        <!-- Search -->
+        <div class="search-bar">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar presentaci&oacute;n..."
+            [(ngModel)]="searchQuery"
+          />
+          @if (searchQuery) {
+            <button type="button" class="search-clear" (click)="clearSearch()">
+              <i class="pi pi-times"></i>
+            </button>
+          }
+        </div>
+
+        <!-- Product filter pills -->
+        <div class="filter-bar">
+          <button
+            class="filter-pill"
+            [class.filter-pill--active]="selectedProductFilter === null"
+            (click)="setProductFilter(null)"
+          >Todos</button>
+
+          @for (name of productNames; track name) {
+            <button
+              class="filter-pill"
+              [class.filter-pill--active]="selectedProductFilter === name"
+              (click)="setProductFilter(name)"
+            >{{ name }}</button>
+          }
+        </div>
+
+        <!-- Presentations grid -->
+        <div class="pres-grid">
+          @if (filteredPresentations.length === 0) {
+            <div class="grid-empty">
+              <i class="pi pi-inbox"></i>
+              <span>Sin presentaciones activas</span>
+            </div>
+          }
+
+          @for (p of filteredPresentations; track trackByPresentationId($index, p)) {
+            <button
+              type="button"
+              class="pres-card"
+              [class.pres-card--selected]="p.id === selectedPresentationId"
+              (click)="selectPresentation(p.id)"
+            >
+              <span class="pres-tag">{{ p.productName }}</span>
+              <span class="pres-name">{{ p.name }}</span>
+              <strong class="pres-price">{{ formatPrice(p.price) }}</strong>
+            </button>
+          }
+        </div>
+
+        <!-- Extras -->
+        @if (extras.length > 0) {
+          <div class="extras-section">
+            <span class="extras-label">
+              <i class="pi pi-plus-circle"></i>
+              Extras
+              @if (selectedExtraIds.length > 0) {
+                <span class="extras-count">{{ selectedExtraIds.length }}</span>
+              }
+            </span>
+            <div class="extras-chips">
+              @for (e of extras; track trackByExtraId($index, e)) {
+                <button
+                  type="button"
+                  class="extra-chip"
+                  [class.extra-chip--on]="selectedExtraIds.includes(e.id)"
+                  (click)="toggleExtra(e.id)"
+                >
+                  <span class="extra-chip__mark">{{ selectedExtraIds.includes(e.id) ? '✓' : '+' }}</span>
+                  <span>{{ e.name }}</span>
+                  <span class="extra-chip__price">{{ formatPrice(e.price) }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Add button -->
+        <button
+          type="button"
+          class="add-btn"
+          [class.add-btn--ready]="!!selectedPresentation"
+          [disabled]="!selectedPresentation"
+          (click)="addToCart()"
+        >
+          @if (selectedPresentation) {
+            <span class="add-btn__label">
+              <i class="pi pi-plus"></i>
+              Agregar — {{ selectedPresentation.productName }} · {{ selectedPresentation.name }}
+            </span>
+            <strong class="add-btn__price">{{ formatPrice(selectedUnitPrice) }}</strong>
+          } @else {
+            <span><i class="pi pi-hand-pointer"></i> Seleccion&aacute; una presentaci&oacute;n</span>
+          }
+        </button>
+      </section>
+
+      <!-- ── Right: Cart ────────────────────────────────── -->
+      <aside class="cart">
+        <div class="cart-header">
+          <div>
+            <h2 class="cart-title">Tu Pedido</h2>
+            <span class="cart-count">
+              @if (cartItemsCount === 0) { Vac&iacute;o }
+              @else { {{ cartItemsCount }} {{ cartItemsCount === 1 ? 'item' : 'items' }} }
+            </span>
+          </div>
+          <button
+            type="button"
+            class="clear-btn"
+            [disabled]="cart.length === 0"
+            (click)="clearCart()"
+            title="Limpiar pedido"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+
+        <div class="cart-items">
+          @if (cart.length === 0) {
+            <div class="cart-empty">
+              <i class="pi pi-shopping-bag"></i>
+              <span>Agreg&aacute; items desde el cat&aacute;logo</span>
+            </div>
+          } @else {
+            @for (item of cart; track trackByCartKey($index, item)) {
+              <div class="cart-item">
+                <div class="cart-item__info">
+                  <span class="cart-item__pres">{{ item.presentationName }}</span>
+                  <span class="cart-item__product">{{ item.productName }}</span>
+                  @if (item.extras.length > 0) {
+                    <div class="cart-item__extras">
+                      @for (e of item.extras; track e.id) {
+                        <span class="cart-extra-tag">{{ e.name }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="cart-item__controls">
+                  <div class="qty">
+                    <button type="button" (click)="decreaseQuantity(item)">−</button>
+                    <span>{{ item.quantity }}</span>
+                    <button type="button" (click)="increaseQuantity(item)">+</button>
+                  </div>
+                  <strong class="cart-item__total">{{ formatPrice(getCartItemTotal(item)) }}</strong>
+                  <button type="button" class="remove-btn" (click)="removeItem(item)" title="Quitar">
+                    <i class="pi pi-times"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="cart-footer">
+          <div class="cart-total">
+            <span>Total</span>
+            <strong>{{ formatPrice(cartTotal) }}</strong>
+          </div>
+          <button
+            type="button"
+            class="checkout-btn"
+            [disabled]="cart.length === 0 || submitting"
+            (click)="submitOrder()"
+          >
+            @if (submitting) {
+              <i class="pi pi-spin pi-spinner"></i>
+              <span>Generando...</span>
+            } @else {
+              <i class="pi pi-check"></i>
+              <span>Generar Pedido</span>
+            }
+          </button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+}

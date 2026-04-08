@@ -1,0 +1,134 @@
+// Ancho estándar para impresora térmica de 80mm (≈302px a 96dpi)
+// El diseño NO varía entre tamaños de pantalla
+:host {
+  display: block;
+}
+
+.ticket {
+  width: 302px;
+  min-width: 302px;
+  max-width: 302px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #000;
+  background: #fff;
+  padding: 10px 8px;
+}
+
+// ── Header ──────────────────────────────────────────────
+.ticket__header {
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.ticket__store {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ticket__tagline {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+// ── Separadores ──────────────────────────────────────────
+.ticket__sep {
+  margin: 5px 0;
+}
+
+.ticket__sep--double {
+  border-top: 2px solid #000;
+}
+
+.ticket__sep--single {
+  border-top: 1px dashed #666;
+}
+
+// ── Meta ─────────────────────────────────────────────────
+.ticket__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.ticket__notes {
+  font-size: 11px;
+  font-style: italic;
+  margin-top: 3px;
+}
+
+// ── Items ─────────────────────────────────────────────────
+.ticket__item {
+  margin: 5px 0;
+}
+
+.ticket__item-row {
+  display: flex;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.ticket__item-qty {
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.ticket__item-name {
+  flex: 1;
+  overflow: hidden;
+  // permite wrapping en nombres largos
+  word-break: break-word;
+}
+
+.ticket__item-price {
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ticket__item-product {
+  font-size: 11px;
+  padding-left: 28px;
+  color: #444;
+}
+
+.ticket__item-extra {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  padding-left: 28px;
+  color: #444;
+}
+
+// ── Total ─────────────────────────────────────────────────
+.ticket__total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 4px 0;
+
+  strong { font-size: 16px; }
+}
+
+// ── Footer ────────────────────────────────────────────────
+.ticket__footer {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+// ── Impresión ──────────────────────────────────────────────
+// Al imprimir, solo el ticket es visible
+@media print {
+  .ticket {
+    width: 80mm;
+    min-width: unset;
+    max-width: unset;
+    padding: 0;
+    margin: 0;
+  }
+}

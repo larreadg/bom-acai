@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 
-import { AuthService } from '../../core/services/auth.service';
+import { TopbarComponent } from '../../shared/topbar/topbar.component';
 
 interface HomeModuleCard {
   title: string;
@@ -16,7 +16,7 @@ interface HomeModuleCard {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ButtonModule, RouterLink],
+  imports: [ButtonModule, RouterLink, TopbarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -25,8 +25,9 @@ export class HomeComponent {
     {
       title: 'Pedidos',
       icon: 'pi pi-shopping-cart',
-      available: false,
-      note: 'Pr\u00f3ximamente',
+      route: '/pedidos',
+      available: true,
+      note: 'Tomar pedido \u00b7 Cantidades \u00b7 Total',
     },
     {
       title: 'Presentaciones',
@@ -56,7 +57,13 @@ export class HomeComponent {
       available: true,
       note: 'Toppings \u00b7 Agregados \u00b7 Precios',
     },
+    {
+      title: 'Configuraci\u00f3n',
+      icon: 'pi pi-sliders-h',
+      route: '/configuracion',
+      available: true,
+      note: 'Impresora \u00b7 Tama\u00f1o de papel',
+    },
   ];
 
-  constructor(public auth: AuthService) {}
 }

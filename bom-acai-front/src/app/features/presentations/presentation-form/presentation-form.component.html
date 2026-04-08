@@ -1,34 +1,10 @@
 <div class="page-shell">
-  <nav class="topbar">
-    <div class="brand" routerLink="/">
-      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="brand-logo" />
-      <div>
-        <span class="brand-title">Bom Aca&iacute;</span>
-        <p class="brand-subtitle">Configuraci&oacute;n de presentaciones</p>
-      </div>
-    </div>
-
-    <div class="topbar-actions">
-      <button
-        pButton
-        type="button"
-        routerLink="/presentaciones"
-        icon="pi pi-arrow-left"
-        label="Volver"
-        severity="secondary"
-        [outlined]="true"
-      ></button>
-      <button
-        pButton
-        type="button"
-        icon="pi pi-sign-out"
-        label="Cerrar sesi&oacute;n"
-        severity="secondary"
-        [text]="true"
-        (click)="auth.logout()"
-      ></button>
-    </div>
-  </nav>
+  <app-topbar
+    subtitle="Configuraci&oacute;n de presentaciones"
+    backRoute="/presentaciones"
+    backLabel="Volver"
+    backIcon="pi pi-arrow-left"
+  ></app-topbar>
 
   <main class="page-content">
     <section class="hero-card">

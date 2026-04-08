@@ -14,8 +14,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
 import { Extra } from '../../../core/models/extra.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { ExtraService } from '../../../core/services/extra.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 
 type StatusFilter = 'all' | 'active' | 'inactive';
 
@@ -32,6 +32,7 @@ type StatusFilter = 'all' | 'active' | 'inactive';
     ProgressSpinnerModule,
     TableModule,
     TagModule,
+    TopbarComponent,
   ],
   templateUrl: './extra-list.component.html',
   styleUrl: './extra-list.component.scss',
@@ -54,7 +55,6 @@ export class ExtraListComponent implements OnInit {
     private service:      ExtraService,
     private messageService: MessageService,
     private cdr:          ChangeDetectorRef,
-    public  auth:         AuthService,
   ) {}
 
   ngOnInit(): void { this.load(); }

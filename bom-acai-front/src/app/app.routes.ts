@@ -53,6 +53,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'pedidos',
+    loadComponent: () => import('./features/orders/order-create/order-create.component').then(m => m.OrderCreateComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard]
@@ -70,6 +75,11 @@ export const routes: Routes = [
   {
     path: 'extras/:id/editar',
     loadComponent: () => import('./features/extras/extra-form/extra-form.component').then(m => m.ExtraFormComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'configuracion',
+    loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
     canActivate: [authGuard]
   },
   {

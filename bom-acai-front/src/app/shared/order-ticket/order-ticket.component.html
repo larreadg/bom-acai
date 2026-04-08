@@ -1,0 +1,58 @@
+<div class="ticket">
+
+  <!-- Header -->
+  <div class="ticket__header">
+    <div class="ticket__store">BOM ACA&Iacute;</div>
+    <div class="ticket__tagline">Sistema de Pedidos</div>
+  </div>
+
+  <div class="ticket__sep ticket__sep--double"></div>
+
+  <!-- Meta -->
+  <div class="ticket__meta">
+    <span>Pedido #{{ formatOrderId(order.id) }}</span>
+    <span>{{ formatDate(order.createdAt) }}</span>
+  </div>
+  <div class="ticket__meta">
+    <span></span>
+    <span>{{ formatTime(order.createdAt) }} hs</span>
+  </div>
+
+  @if (order.notes) {
+    <div class="ticket__notes">Nota: {{ order.notes }}</div>
+  }
+
+  <div class="ticket__sep ticket__sep--single"></div>
+
+  <!-- Items -->
+  @for (item of order.items; track item.id) {
+    <div class="ticket__item">
+      <div class="ticket__item-row">
+        <span class="ticket__item-qty">x{{ item.quantity }}</span>
+        <span class="ticket__item-name">{{ item.presentationName }}</span>
+        <span class="ticket__item-price">{{ formatPrice(item.subtotal) }}</span>
+      </div>
+      <div class="ticket__item-product">{{ item.productName }}</div>
+      @for (extra of item.extras; track extra.id) {
+        <div class="ticket__item-extra">
+          <span>&nbsp;&nbsp;+ {{ extra.extraName }}</span>
+          <span>{{ formatPrice(extra.unitPrice) }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="ticket__sep ticket__sep--double"></div>
+
+  <!-- Total -->
+  <div class="ticket__total">
+    <span>TOTAL</span>
+    <strong>{{ formatPrice(order.total) }}</strong>
+  </div>
+
+  <div class="ticket__sep ticket__sep--double"></div>
+
+  <!-- Footer -->
+  <div class="ticket__footer">&iexcl;Gracias por su pedido!</div>
+
+</div>

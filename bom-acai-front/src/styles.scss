@@ -13,3 +13,19 @@ textarea,
 select {
     font-family: inherit;
 }
+
+// ── Impresión: mostrar solo el ticket térmico ──────────────
+@media print {
+  * { visibility: hidden; }
+
+  .thermal-ticket,
+  .thermal-ticket * { visibility: visible; }
+
+  .thermal-ticket {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+  }
+}

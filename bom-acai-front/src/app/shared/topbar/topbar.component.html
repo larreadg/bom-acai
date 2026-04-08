@@ -1,0 +1,41 @@
+<nav class="topbar">
+
+  <!-- Brand -->
+  <a class="brand" routerLink="/">
+    <img src="/bomacai.png" alt="Bom Açaí" class="brand-logo" />
+    <div class="brand-copy">
+      <span class="brand-title">Bom Aca&iacute;</span>
+      @if (subtitle) {
+        <span class="brand-subtitle">{{ subtitle }}</span>
+      }
+    </div>
+  </a>
+
+  <!-- Actions -->
+  <div class="topbar-actions">
+    @if (backRoute !== null) {
+      <button
+        pButton
+        type="button"
+        [routerLink]="backRoute"
+        [icon]="backIcon"
+        [label]="backLabel"
+        severity="secondary"
+        [outlined]="true"
+        class="nav-btn"
+      ></button>
+    }
+
+    <button
+      pButton
+      type="button"
+      icon="pi pi-sign-out"
+      label="Cerrar sesi&oacute;n"
+      severity="secondary"
+      [text]="true"
+      class="logout-btn"
+      (click)="auth.logout()"
+    ></button>
+  </div>
+
+</nav>

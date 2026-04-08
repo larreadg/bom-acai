@@ -1,0 +1,101 @@
+<div class="page-shell">
+
+  <app-topbar
+    subtitle="Configuraci&oacute;n"
+    backRoute="/"
+    backLabel="Inicio"
+    backIcon="pi pi-home"
+  ></app-topbar>
+
+  <main class="page-content">
+
+    <!-- Hero -->
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow"><i class="pi pi-sliders-h"></i>&nbsp; Ajustes del punto de venta</span>
+        <h1>Configuraci&oacute;n</h1>
+        <p>Los ajustes se almacenan localmente en este dispositivo y no se sincronizan con el servidor.</p>
+      </div>
+    </section>
+
+    <!-- Form card -->
+    <section class="form-card">
+
+      <!-- ── Impresora ──────────────────────────── -->
+      <div class="form-section">
+        <h2 class="form-section__title">
+          <i class="pi pi-print"></i>
+          Impresora t&eacute;rmica
+        </h2>
+
+        <!-- Tamaño de papel -->
+        <div class="field">
+          <label class="field__label">Tama&ntilde;o de papel</label>
+          <p-select-button
+            [(ngModel)]="settings.paperWidth"
+            [options]="paperOptions"
+            optionLabel="label"
+            optionValue="value"
+          ></p-select-button>
+          <span class="field__hint">
+            El tama&ntilde;o predeterminado es <strong>80 mm</strong>.
+            Selecci&oacute;n&#225; 58 mm si tu impresora usa papel m&aacute;s estrecho.
+          </span>
+        </div>
+
+        <!-- URL del servicio -->
+        <div class="field">
+          <label class="field__label">
+            URL local de QZ Tray
+            <span class="field__badge">
+              @if (printerConfigured) {
+                <p-tag severity="success" value="Configurado" icon="pi pi-check"></p-tag>
+              } @else {
+                <p-tag severity="secondary" value="No configurado"></p-tag>
+              }
+            </span>
+          </label>
+          <input
+            pInputText
+            type="url"
+            [(ngModel)]="settings.printerUrl"
+            placeholder="https://localhost:8181"
+            class="field__input"
+          />
+          <span class="field__hint">
+            Solo se admite una URL local de <strong>QZ Tray</strong> en <code>localhost</code> o <code>127.0.0.1</code>.
+            Si no est&aacute; configurado, el ticket se descarga como imagen PNG.
+          </span>
+        </div>
+
+        <!-- Info QZ Tray -->
+        <div class="info-box">
+          <i class="pi pi-info-circle info-box__icon"></i>
+          <div>
+            <strong>¿C&oacute;mo configurar QZ Tray?</strong>
+            <p>
+              Instal&aacute; <a href="https://qz.io" target="_blank" rel="noopener">QZ Tray</a> en esta m&aacute;quina.
+              Una vez corriendo, el navegador debe conectarse por <code>wss://localhost</code> usando los puertos seguros
+              de QZ Tray. Guard&aacute; arriba una URL local como <code>https://localhost:8181</code>.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Save -->
+      <div class="form-actions">
+        <button
+          pButton
+          type="button"
+          label="Guardar ajustes"
+          icon="pi pi-save"
+          [loading]="saving"
+          (click)="save()"
+        ></button>
+      </div>
+
+    </section>
+
+  </main>
+</div>

@@ -15,8 +15,8 @@ import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 
 import { Category, CategoryFormPayload } from '../../../core/models/category.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 
 interface CategoryFormValue {
   name: string;
@@ -38,6 +38,7 @@ interface CategoryFormValue {
     ProgressSpinnerModule,
     TagModule,
     TextareaModule,
+    TopbarComponent,
   ],
   templateUrl: './category-form.component.html',
   styleUrl: './category-form.component.scss'
@@ -58,7 +59,6 @@ export class CategoryFormComponent implements OnInit {
     private categoryService: CategoryService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
-    public auth: AuthService
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(80)]],

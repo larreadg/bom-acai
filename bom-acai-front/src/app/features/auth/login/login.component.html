@@ -33,6 +33,49 @@
         />
       </div>
 
+      <!-- CAPTCHA -->
+      <div class="field">
+        <div class="captcha-label-row">
+          <label for="captchaAnswer">Verificaci&oacute;n</label>
+          <button
+            type="button"
+            class="captcha-refresh"
+            title="Generar nuevo c&oacute;digo"
+            [disabled]="captchaLoading"
+            (click)="loadCaptcha()"
+          >
+            <i class="pi pi-refresh" [class.spinning]="captchaLoading"></i>
+          </button>
+        </div>
+
+        <div class="captcha-image-box">
+          @if (captchaLoading) {
+            <div class="captcha-spinner">
+              <p-progress-spinner strokeWidth="4" animationDuration=".6s" [style]="{ width: '32px', height: '32px' }" />
+            </div>
+          } @else if (captcha) {
+            <img [src]="captcha.image" alt="C&oacute;digo de verificaci&oacute;n" class="captcha-img" />
+          } @else {
+            <span class="captcha-error">No se pudo cargar el c&oacute;digo.
+              <button type="button" class="captcha-retry" (click)="loadCaptcha()">Reintentar</button>
+            </span>
+          }
+        </div>
+
+        <input
+          id="captchaAnswer"
+          pInputText
+          formControlName="captchaAnswer"
+          placeholder="Escrib&iacute; el c&oacute;digo de la imagen"
+          autocomplete="off"
+          [class.ng-invalid]="form.get('captchaAnswer')?.invalid && form.get('captchaAnswer')?.touched"
+        />
+      </div>
+
+      @if (error) {
+        <p-message severity="error">{{ error }}</p-message>
+      }
+
       <button
         pButton
         type="submit"
@@ -40,7 +83,7 @@
         label="Iniciar sesi&oacute;n"
         icon="pi pi-sign-in"
         [loading]="loading"
-        [disabled]="form.invalid || loading"
+        [disabled]="form.invalid || loading || !captcha"
       ></button>
     </form>
   </div>

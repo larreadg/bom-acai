@@ -14,8 +14,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
 import { ProductPresentation } from '../../../core/models/product.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { PresentationService } from '../../../core/services/presentation.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 import { environment } from '../../../../environments/environment';
 
 type StatusFilter = 'all' | 'active' | 'inactive';
@@ -33,6 +33,7 @@ type StatusFilter = 'all' | 'active' | 'inactive';
     ProgressSpinnerModule,
     TableModule,
     TagModule,
+    TopbarComponent,
   ],
   templateUrl: './presentation-list.component.html',
   styleUrl: './presentation-list.component.scss',
@@ -57,7 +58,6 @@ export class PresentationListComponent implements OnInit {
     private service: PresentationService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
-    public  auth: AuthService,
   ) {}
 
   ngOnInit(): void {

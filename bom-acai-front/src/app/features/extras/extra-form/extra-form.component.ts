@@ -15,8 +15,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 
 import { Extra, ExtraFormPayload } from '../../../core/models/extra.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { ExtraService } from '../../../core/services/extra.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 
 interface ExtraFormValue {
   name:   string;
@@ -38,6 +38,7 @@ interface ExtraFormValue {
     MessageModule,
     ProgressSpinnerModule,
     TagModule,
+    TopbarComponent,
   ],
   templateUrl: './extra-form.component.html',
   styleUrl: './extra-form.component.scss',
@@ -58,7 +59,6 @@ export class ExtraFormComponent implements OnInit {
     private service:        ExtraService,
     private messageService: MessageService,
     private cdr:            ChangeDetectorRef,
-    public  auth:           AuthService,
   ) {
     this.form = this.fb.group({
       name:   ['',   [Validators.required, Validators.maxLength(80)]],

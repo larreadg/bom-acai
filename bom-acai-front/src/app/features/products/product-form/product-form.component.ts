@@ -18,9 +18,9 @@ import { TextareaModule } from 'primeng/textarea';
 
 import { Category } from '../../../core/models/category.model';
 import { Product, ProductFormPayload } from '../../../core/models/product.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { ProductService } from '../../../core/services/product.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 
 interface ProductFormValue {
   categoryId: number | null;
@@ -49,6 +49,7 @@ interface ProductFormData {
     SelectModule,
     TagModule,
     TextareaModule,
+    TopbarComponent,
   ],
   templateUrl: './product-form.component.html',
   styleUrl: './product-form.component.scss'
@@ -72,7 +73,6 @@ export class ProductFormComponent implements OnInit {
     private productService: ProductService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
-    public auth: AuthService
   ) {
     this.form = this.fb.group({
       categoryId: [null, Validators.required],

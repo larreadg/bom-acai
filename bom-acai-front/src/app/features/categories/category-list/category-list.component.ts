@@ -14,8 +14,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
 import { Category } from '../../../core/models/category.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { TopbarComponent } from '../../../shared/topbar/topbar.component';
 
 type CategoryStatusFilter = 'all' | 'active' | 'inactive';
 
@@ -32,6 +32,7 @@ type CategoryStatusFilter = 'all' | 'active' | 'inactive';
     ProgressSpinnerModule,
     TableModule,
     TagModule,
+    TopbarComponent,
   ],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.scss'
@@ -55,7 +56,6 @@ export class CategoryListComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    public auth: AuthService
   ) {}
 
   ngOnInit(): void {

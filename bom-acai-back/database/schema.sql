@@ -26,6 +26,21 @@ CREATE INDEX IF NOT EXISTS "idx_auth_tokens_token_hash"
 CREATE INDEX IF NOT EXISTS "idx_auth_tokens_user_id"
     ON "auth_tokens" ("user_id");
 
+CREATE TABLE IF NOT EXISTS "captcha_challenges" (
+    "id"         INTEGER  PRIMARY KEY AUTOINCREMENT,
+    "token"      TEXT     NOT NULL UNIQUE,
+    "answer"     TEXT     NOT NULL,
+    "ip"         TEXT     NOT NULL,
+    "expires_at" DATETIME NOT NULL,
+    "used"       INTEGER  NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS "idx_captcha_token"
+    ON "captcha_challenges" ("token");
+
+CREATE INDEX IF NOT EXISTS "idx_captcha_ip_expires"
+    ON "captcha_challenges" ("ip", "expires_at");
+
 -- Catalogue ---------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS "categories" (

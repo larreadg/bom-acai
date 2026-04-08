@@ -11,21 +11,28 @@ require_once __DIR__ . '/app/core/ApiResponse.php';
 
 // Config
 require_once __DIR__ . '/app/config/Database.php';
+require_once __DIR__ . '/app/config/QzTray.php';
 
 // Services
 require_once __DIR__ . '/app/services/AuthService.php';
+require_once __DIR__ . '/app/services/CaptchaService.php';
 require_once __DIR__ . '/app/services/CategoryService.php';
 require_once __DIR__ . '/app/services/ProductService.php';
 require_once __DIR__ . '/app/services/ProductPresentationService.php';
 require_once __DIR__ . '/app/services/ImageService.php';
 require_once __DIR__ . '/app/services/ExtraService.php';
+require_once __DIR__ . '/app/services/OrderService.php';
+require_once __DIR__ . '/app/services/QzSecurityService.php';
 
 // Controllers
 require_once __DIR__ . '/app/controllers/AuthController.php';
+require_once __DIR__ . '/app/controllers/CaptchaController.php';
 require_once __DIR__ . '/app/controllers/CategoryController.php';
 require_once __DIR__ . '/app/controllers/ProductController.php';
 require_once __DIR__ . '/app/controllers/ProductPresentationController.php';
 require_once __DIR__ . '/app/controllers/ExtraController.php';
+require_once __DIR__ . '/app/controllers/OrderController.php';
+require_once __DIR__ . '/app/controllers/QzController.php';
 
 // Middleware
 require_once __DIR__ . '/app/middleware/AuthMiddleware.php';
@@ -53,6 +60,8 @@ Flight::group('/api', function () {
     require_once __DIR__ . '/app/routes/products.php';
     require_once __DIR__ . '/app/routes/product_presentations.php';
     require_once __DIR__ . '/app/routes/extras.php';
+    require_once __DIR__ . '/app/routes/orders.php';
+    require_once __DIR__ . '/app/routes/qz.php';
 }, [new AuthMiddleware()]);
 
 Flight::start();

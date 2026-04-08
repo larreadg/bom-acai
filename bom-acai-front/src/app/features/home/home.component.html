@@ -1,20 +1,5 @@
 <div class="layout">
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <img src="/bomacai.png" alt="Bom Aca&iacute;" class="navbar-logo" />
-      <span class="navbar-title">Bom Aca&iacute;</span>
-    </div>
-
-    <button
-      pButton
-      type="button"
-      label="Cerrar sesi&oacute;n"
-      icon="pi pi-sign-out"
-      severity="secondary"
-      [text]="true"
-      (click)="auth.logout()"
-    ></button>
-  </nav>
+  <app-topbar subtitle="Sistema de Gesti&oacute;n"></app-topbar>
 
   <main class="content">
     <div class="welcome-card">

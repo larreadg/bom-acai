@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,8 +10,9 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService, CaptchaData } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -23,25 +24,46 @@ import { AuthService } from '../../../core/services/auth.service';
     InputTextModule,
     PasswordModule,
     MessageModule,
+    ProgressSpinnerModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   form: FormGroup;
-  loading = false;
-  error = '';
+  loading        = false;
+  captchaLoading = false;
+  error          = '';
+  captcha: CaptchaData | null = null;
 
   constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router,
-    private ngZone: NgZone,
-    private messageService: MessageService
+    private fb:             FormBuilder,
+    private auth:           AuthService,
+    private router:         Router,
+    private ngZone:         NgZone,
+    private cdr:            ChangeDetectorRef,
+    private messageService: MessageService,
   ) {
     this.form = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
+      username:      ['', Validators.required],
+      password:      ['', Validators.required],
+      captchaAnswer: ['', Validators.required],
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadCaptcha();
+  }
+
+  loadCaptcha(): void {
+    this.captchaLoading = true;
+    this.form.get('captchaAnswer')?.reset('');
+
+    this.auth.getCaptcha().pipe(
+      finalize(() => { this.captchaLoading = false; this.cdr.detectChanges(); })
+    ).subscribe({
+      next:  data => { this.captcha = data;  this.cdr.detectChanges(); },
+      error: ()   => { this.captcha = null;  this.cdr.detectChanges(); },
     });
   }
 
@@ -51,60 +73,49 @@ export class LoginComponent {
       return;
     }
 
+    if (!this.captcha) {
+      this.loadCaptcha();
+      return;
+    }
+
     this.loading = true;
-    this.error = '';
+    this.error   = '';
 
-    const { username, password } = this.form.getRawValue();
+    const { username, password, captchaAnswer } = this.form.getRawValue();
 
-    this.auth.login(username, password).pipe(
+    this.auth.login(username, password, this.captcha.token, captchaAnswer).pipe(
       finalize(() => {
-        this.ngZone.run(() => {
-          this.loading = false;
-        });
+        this.ngZone.run(() => { this.loading = false; });
       })
     ).subscribe({
       next: () => {
-        this.ngZone.run(() => {
-          this.router.navigate(['/']);
-        });
+        this.ngZone.run(() => { this.router.navigate(['/']); });
       },
       error: (err: HttpErrorResponse) => {
         const message = this.getErrorMessage(err);
 
         this.ngZone.run(() => {
           this.error = message;
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Inicio de sesi\u00f3n',
-            detail: message,
-          });
+          this.messageService.add({ severity: 'error', summary: 'Inicio de sesión', detail: message });
+
+          // Always refresh captcha after a failed attempt
+          this.loadCaptcha();
         });
-      }
+      },
     });
   }
 
   private getErrorMessage(err: HttpErrorResponse): string {
-    if (typeof err.error === 'string' && err.error.trim()) {
-      return err.error.trim();
-    }
+    if (typeof err.error === 'string' && err.error.trim()) return err.error.trim();
 
     if (err.error && typeof err.error === 'object') {
-      const message = err.error.message;
-      const error = err.error.error;
-
-      if (typeof message === 'string' && message.trim()) {
-        return message.trim();
-      }
-
-      if (typeof error === 'string' && error.trim()) {
-        return error.trim();
-      }
+      const msg = err.error.message;
+      if (typeof msg === 'string' && msg.trim()) return msg.trim();
     }
 
-    if (err.status === 401) {
-      return 'Usuario o contrase\u00f1a incorrectos';
-    }
+    if (err.status === 401) return 'Usuario o contraseña incorrectos.';
+    if (err.status === 400) return err.error?.message ?? 'Verificá los datos ingresados.';
 
-    return 'Error al iniciar sesi\u00f3n';
+    return 'Error al iniciar sesión.';
   }
 }
