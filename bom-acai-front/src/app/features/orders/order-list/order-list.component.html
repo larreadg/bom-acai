@@ -2,15 +2,12 @@
   <app-topbar subtitle="Historial de Pedidos" backRoute="/" backLabel="Inicio" backIcon="pi pi-home"></app-topbar>
 
   <main class="content">
-
-    <!-- Hero -->
     <div class="hero-card">
       <span class="hero-eyebrow">Bom Aca&iacute;</span>
       <h1>Historial de Pedidos</h1>
       <p>Consult&aacute; y administr&aacute; los pedidos registrados.</p>
     </div>
 
-    <!-- Summary -->
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-value">{{ summary.totalOrders }}</span>
@@ -18,7 +15,7 @@
       </div>
       <div class="stat-card stat-card--highlight">
         <span class="stat-value">{{ formatPrice(summary.totalAmount) }}</span>
-        <span class="stat-label">Facturación</span>
+        <span class="stat-label">Facturaci&oacute;n</span>
       </div>
       <div class="stat-card stat-card--cost">
         <span class="stat-value">{{ formatPrice(summary.totalCost) }}</span>
@@ -30,35 +27,55 @@
       </div>
     </div>
 
-    <!-- Table card -->
     <div class="table-card">
-
       <div class="table-toolbar">
-        <p-selectbutton
-          [(ngModel)]="dateRange"
-          [options]="dateRangeOptions"
-          optionLabel="label"
-          optionValue="value"
-          (onChange)="onDateRangeChange()"
-        ></p-selectbutton>
+        <div class="toolbar-filters">
+          <div class="date-filter-bar" role="tablist" aria-label="Filtro por fecha">
+            @for (option of dateRangeOptions; track option.value) {
+              <button
+                type="button"
+                class="date-filter-pill"
+                [class.date-filter-pill--active]="dateRange === option.value"
+                (click)="setDateRange(option.value)"
+              >
+                {{ option.label }}
+              </button>
+            }
+          </div>
 
-        @if (dateRange === 'custom') {
-          <p-datepicker
-            [(ngModel)]="customRange"
-            selectionMode="range"
-            [readonlyInput]="true"
-            dateFormat="dd/mm/yy"
-            placeholder="Desde — Hasta"
-            (onSelect)="onCustomRangeChange()"
-          ></p-datepicker>
-        }
+          @if (dateRange === 'custom') {
+            <p-datepicker
+              [(ngModel)]="customRange"
+              selectionMode="range"
+              [readonlyInput]="true"
+              dateFormat="dd/mm/yy"
+              placeholder="Desde - Hasta"
+              (onSelect)="onCustomRangeChange()"
+            ></p-datepicker>
+          }
+        </div>
 
-        <span class="toolbar-spacer"></span>
-
-        <button pButton icon="pi pi-file-excel" label="Exportar" severity="success" [outlined]="true"
-          [loading]="exporting" [disabled]="orders.length === 0" (click)="exportExcel()">
-        </button>
-        <button pButton icon="pi pi-refresh" [text]="true" [rounded]="true" severity="secondary" (click)="load()" [loading]="loading"></button>
+        <div class="toolbar-actions">
+          <button
+            pButton
+            icon="pi pi-file-excel"
+            label="Exportar"
+            severity="success"
+            [outlined]="true"
+            [loading]="exporting"
+            [disabled]="orders.length === 0"
+            (click)="exportExcel()"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-refresh"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            (click)="load()"
+            [loading]="loading"
+          ></button>
+        </div>
       </div>
 
       <p-table
@@ -93,14 +110,22 @@
               <span>{{ formatDateTime(order.createdAt).date }}</span>
               <small>{{ formatDateTime(order.createdAt).time }} hs</small>
             </td>
-            <td class="order-notes">{{ order.notes ?? '—' }}</td>
+            <td class="order-notes">{{ order.notes ?? '-' }}</td>
             <td class="order-total">{{ formatPrice(order.total) }}</td>
             <td class="order-actions">
               @if (order.status !== 'cancelled') {
-                <button pButton type="button" icon="pi pi-times-circle" [text]="true" [rounded]="true"
-                  severity="danger" size="small" pTooltip="Cancelar pedido" tooltipPosition="left"
-                  (click)="confirmCancel(order)">
-                </button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-times-circle"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="danger"
+                  size="small"
+                  pTooltip="Cancelar pedido"
+                  tooltipPosition="left"
+                  (click)="confirmCancel(order)"
+                ></button>
               }
             </td>
           </tr>
@@ -142,11 +167,9 @@
         </ng-template>
       </p-table>
     </div>
-
   </main>
 </div>
 
-<!-- Cancel confirm -->
 <p-dialog
   [(visible)]="cancelVisible"
   [modal]="true"
@@ -160,13 +183,28 @@
   @if (cancelTarget) {
     <div class="confirm-body">
       <i class="pi pi-exclamation-triangle confirm-icon"></i>
-      <p>¿Confirmar cancelaci&oacute;n del pedido <strong>#{{ formatOrderId(cancelTarget.id) }}</strong>?</p>
+      <p>&iquest;Confirmar cancelaci&oacute;n del pedido <strong>#{{ formatOrderId(cancelTarget.id) }}</strong>?</p>
       <p class="confirm-total">Total: {{ formatPrice(cancelTarget.total) }}</p>
       <p class="confirm-hint">Esta acci&oacute;n no se puede deshacer.</p>
     </div>
   }
   <ng-template pTemplate="footer">
-    <button pButton type="button" label="Volver" severity="secondary" [outlined]="true" [disabled]="cancelling" (click)="cancelTarget = null"></button>
-    <button pButton type="button" label="Cancelar pedido" severity="danger" [loading]="cancelling" (click)="doCancel()"></button>
+    <button
+      pButton
+      type="button"
+      label="Volver"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="cancelling"
+      (click)="cancelTarget = null"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Cancelar pedido"
+      severity="danger"
+      [loading]="cancelling"
+      (click)="doCancel()"
+    ></button>
   </ng-template>
 </p-dialog>

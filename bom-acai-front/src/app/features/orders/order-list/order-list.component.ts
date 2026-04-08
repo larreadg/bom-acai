@@ -7,7 +7,6 @@ import { finalize } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
-import { SelectButton } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 
@@ -21,7 +20,7 @@ type DateRange = 'today' | 'yesterday' | 'week' | 'month' | 'custom';
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, DatePicker, SelectButton, TableModule, Dialog, TopbarComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, DatePicker, TableModule, Dialog, TopbarComponent],
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.scss',
 })
@@ -41,7 +40,7 @@ export class OrderListComponent implements OnInit {
   get cancelVisible(): boolean { return this.cancelTarget !== null; }
   set cancelVisible(v: boolean) { if (!v) this.cancelTarget = null; }
 
-  readonly dateRangeOptions = [
+  readonly dateRangeOptions: Array<{ label: string; value: DateRange }> = [
     { label: 'Hoy',           value: 'today'     },
     { label: 'Ayer',          value: 'yesterday' },
     { label: 'Esta semana',   value: 'week'      },
@@ -102,6 +101,11 @@ export class OrderListComponent implements OnInit {
       this.customRange = null;
       this.load();
     }
+  }
+
+  setDateRange(range: DateRange): void {
+    this.dateRange = range;
+    this.onDateRangeChange();
   }
 
   onCustomRangeChange(): void {

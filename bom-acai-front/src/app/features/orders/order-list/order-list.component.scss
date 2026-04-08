@@ -58,13 +58,65 @@
 
 .table-toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 12px;
   padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
 }
-.toolbar-spacer { flex: 1; }
+
+.toolbar-filters {
+  flex: 1 1 540px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toolbar-filters p-datepicker {
+  width: 100%;
+}
+
+.date-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.date-filter-pill {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #d9e0ea;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #506784;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s ease;
+
+  &:hover {
+    border-color: rgba(124, 58, 237, .32);
+    background: #f4f0ff;
+    color: #5b21b6;
+  }
+
+  &--active {
+    border-color: #7c3aed;
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(124, 58, 237, .24);
+  }
+}
+
+.toolbar-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
 
 // ── Row toggle button ─────────────────────────────────────────
 .row-toggle-btn {
@@ -150,5 +202,26 @@
   .content { padding: 16px 12px 32px; }
   .hero-card { padding: 20px; }
   .hero-card h1 { font-size: 20px; }
-  .table-toolbar { flex-wrap: wrap; }
+  .table-toolbar {
+    padding: 16px;
+    gap: 14px;
+  }
+  .toolbar-filters {
+    flex-basis: 100%;
+  }
+  .date-filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .date-filter-bar::-webkit-scrollbar { display: none; }
+  .date-filter-pill {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
